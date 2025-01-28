@@ -1,4 +1,14 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/example/public_html/
-    - /bin/cp -R images $DEPLOYPATH
+    - export DEPLOYPATH=/home/farmylxl/public_html/
+    # Step 1: Copy project files, excluding .git and .cpanel.yml
+    - rsync -av --delete --exclude=".git" --exclude=".cpanel.yml" ./ $DEPLOYPATH/
+    # Step 2: Move to the deployment path
+    - cd $DEPLOYPATH
+    # Step 3: Install Laravel dependencies
+    - /bin/composer install --no-dev --optimize-autoloader -d $DEPLOYPATH
+    # Step 4: Run Laravel commands
+    - php $DEPLOYPATH/artisan migrate --force
+    - php $DEPLOYPATH/artisan config:cache
+    - php $DEPLOYPATH/artisan route:cache
+    - php $DEPLOYPATH/artisan view:cache
