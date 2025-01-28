@@ -1,0 +1,21 @@
+@keyframes sunArc {
+    0% { transform: translateX(-5px) translateY(2px); }
+    25% { transform: translateX(0px) translateY(0px); }
+    50% { transform: translateX(5px) translateY(2px); }
+    75% { transform: translateX(0px) translateY(0px); }
+    100% { transform: translateX(-5px) translateY(2px); }
+}
+
+@keyframes cloudTilt {
+    0% { transform: rotate(3deg); }
+    50% { transform: rotate(-3deg); }
+    100% { transform: rotate(3deg); }
+}
+
+.sun {
+    animation: sunArc 2s linear infinite;
+}
+
+.cloud {
+    animation: cloudTilt 2s linear infinite;
+}

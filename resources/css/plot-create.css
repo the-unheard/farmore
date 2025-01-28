@@ -1,0 +1,8 @@
+#map { height: 300px; top: 0; bottom: 0; }
+
+.marker {
+    background-size: cover;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
