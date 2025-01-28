@@ -1,0 +1,9 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/farmylxl/public_html
+    - /bin/cp -r . $DEPLOYPATH/
+    - /bin/composer install --no-dev --optimize-autoloader -d $DEPLOYPATH
+    - php $DEPLOYPATH/artisan migrate --force
+    - php $DEPLOYPATH/artisan config:cache
+    - php $DEPLOYPATH/artisan route:cache
+    - php $DEPLOYPATH/artisan view:cache
