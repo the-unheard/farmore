@@ -1,6 +1,6 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/farmylxl/public_html
+    - export DEPLOYPATH=/home/farmylxl/public_html/
     # Step 1: Copy project files, excluding .git and .cpanel.yml
     - rsync -av --exclude=".git" --exclude=".cpanel.yml" ./ $DEPLOYPATH/
     # Step 2: Move to the deployment path
