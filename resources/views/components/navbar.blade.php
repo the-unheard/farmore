@@ -22,13 +22,13 @@
         <div class="space-y-3 pb-3 gradient-border-bottom">
             <label class="px-3 text-xs text-gray-500 uppercase font-semibold">Guidance</label>
             <x-navbar-links href="/crop-recommendation" icon="fa-seedling">Crop Recommendation</x-navbar-links>
-            <x-navbar-links href="/test" icon="fa-book">Knowledge Base</x-navbar-links>
+{{--            <x-navbar-links href="/test" icon="fa-book">Knowledge Base</x-navbar-links>--}}
         </div>
         @role('admin')
             <div class="space-y-3 ">
                 <label class="px-3 text-xs text-gray-500 uppercase font-semibold">Moderation</label>
                 <x-navbar-links href="#" icon="fa-user-gear">Manage Users</x-navbar-links>
-                <x-navbar-links href="#" icon="fa-square-plus">Create Post</x-navbar-links>
+{{--                <x-navbar-links href="#" icon="fa-square-plus">Create Post</x-navbar-links>--}}
             </div>
         @endrole
     </nav>
