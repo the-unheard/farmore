@@ -1,5 +1,5 @@
 <x-layout-auth>
-    <x-slot:title>GreenMap - Register</x-slot:title>
+    <x-slot:title>Farmore - Register</x-slot:title>
 
     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div class="bg-gray-50 p-12 rounded-lg shadow-sm mx-auto sm:w-full sm:max-w-sm border-gray-200 border-2">

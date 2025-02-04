@@ -9,6 +9,7 @@ use App\Models\Plot;
 use App\Services\CropRecommendationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function Pest\Laravel\get;
 
@@ -37,11 +38,47 @@ class CropYieldController extends Controller
             ->orderBy('harvest_date', 'desc')
             ->take(15)->get()->sortBy('harvest_date');
 
+        $bestCropYields = CropYield::where('plot_id', $selectedPlot)
+            ->get() // Get all records first
+            ->map(function ($yield) use ($selectedPlot) {
+                // Get expected yield range from CropData
+                $cropData = CropData::where('crop_name', $yield->crop)->first();
+
+                // Convert expected yield range for this plot's size
+                $expectedMinYield = $cropData->yield_min * Plot::where('id', $selectedPlot)->value('hectare');
+                $expectedMaxYield = $cropData->yield_max * Plot::where('id', $selectedPlot)->value('hectare');
+
+                // Performance percentage (how well it performed)
+                if ($expectedMaxYield > 0) {
+                    $performance = ($yield->actual_yield / $expectedMaxYield) * 100;
+                } else {
+                    $performance = 0; // Avoid division by zero
+                }
+
+                return [
+                    'id' => $yield->id,
+                    'crop_name' => $yield->crop,
+                    'actual_yield' => $yield->actual_yield,
+                    'expected_min' => $expectedMinYield,
+                    'expected_max' => $expectedMaxYield,
+                    'performance' => round($performance, 2) // % of expected max yield
+                ];
+            })
+            ->sortByDesc('performance') // sort by best performance
+            ->take(8) // keep top 8 performers
+            ->values(); // reset keys for clean output
+
         return view('crop-yield.index', [
             'yields' => $yields, // for displaying crop yield records
             'plots' => $plots, // for displaying plot names on the dropdown
             'selectedPlot' => $selectedPlot, // for the Add New crop yield record button
             'latestCropYields' => $latestCropYields, // for displaying the chart
+            'highestCropYields' => CropYield::where('plot_id', $selectedPlot)
+                ->orderBy('actual_yield', 'desc')->take(8)->get(),
+            'mostPlantedCrops' => CropYield::where('plot_id', $selectedPlot)
+                ->select('crop', DB::raw('COUNT(*) as crop_count'))->groupBy('crop')
+                ->orderBy('crop_count', 'desc')->take(5)->get(),
+            'bestCropYields' => $bestCropYields,
         ]);
     }
 

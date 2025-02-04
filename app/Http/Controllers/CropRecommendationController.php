@@ -6,6 +6,7 @@ use App\Models\CropData;
 use App\Models\CropRecommendation;
 use App\Models\Plot;
 use App\Services\CropRecommendationService;
+use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Phpml\Classification\KNearestNeighbors;
 use Phpml\Classification\NaiveBayes;
@@ -15,6 +16,8 @@ class CropRecommendationController extends Controller
 {
     public function index(Request $request)
     {
+        $recommendationService = new recommendationService();
+
         // get the current logged-in user
         $user = auth()->user();
 
@@ -26,17 +29,40 @@ class CropRecommendationController extends Controller
             return redirect()->route('plot.index')->with('warning', 'You must create a Plot first.');
         }
 
-        // checks for request parameter (/index?plot_id={id}), then fall back is first plot in database
+        // checks for request parameter (/index?plot_id={id}), then fallback is first plot in database
         $selectedPlotId = $request->input('plot_id', $plots->first()->id);
         $selectedPlot = Plot::where('user_id', $user->id)->findOrFail($selectedPlotId);
-        $plotSoilHealth = $selectedPlot->latestSoil;
 
-        $cropWithPoints = $this->getCropPoints($selectedPlot, $plotSoilHealth);
+        //$cropWithPoints = $this->getCropPoints($selectedPlot, $plotSoilHealth);
+
+        // crop recommendations
+        $recommendationBySoilHealth = $recommendationService->recommendBySoilHealth($selectedPlot); // returns a single crop information (array)
+        $recommendationBySeason = $recommendationService->recommendBySeason($selectedPlot)->toArray(); // returns an array of crops and their information (array of arrays)
+
+        $finalRecommendations = [];
+
+        // Add the first recommendation only if it's an array
+        if (is_array($recommendationBySoilHealth)) {
+            $finalRecommendations[] = $recommendationBySoilHealth;
+            $soilHealthCropName = $recommendationBySoilHealth['crop_name']; // store the crop name for checking
+        } else {
+            $soilHealthCropName = null;
+        }
+
+        // add seasonal crops only if they are not already in the final recommendations
+        if (is_array($recommendationBySeason)) {
+            foreach ($recommendationBySeason as $crop) {
+                if (is_array($crop) && $crop['crop_name'] !== $soilHealthCropName) {
+                    $finalRecommendations[] = $crop;
+                }
+            }
+        }
 
         return view('crop-recommendation.index', [
             'plots' => $plots, // for displaying plot names on the dropdown
             'selectedPlotId' => $selectedPlotId, // for the Add New crop yield record button
-            'cropWithPoints' => $cropWithPoints,
+            //'cropWithPoints' => $cropWithPoints,
+            'finalRecommendations' => $finalRecommendations
         ]);
     }
 
@@ -173,5 +199,6 @@ class CropRecommendationController extends Controller
         return $allCrops;
 
     }
+
 
 }

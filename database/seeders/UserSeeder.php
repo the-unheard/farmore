@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
 
         // Create an admin user or assign the role to an existing user
         $user = User::firstOrCreate([
-            'email' => 'admin@greenmap.com',
+            'email' => 'admin@farmore.com',
         ], [
             'username' => 'Admin',
             'password' => Hash::make('asdasd'),

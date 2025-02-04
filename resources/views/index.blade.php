@@ -51,7 +51,7 @@
     <!-- Qualities -->
     <section class="pt-16 pb-32 bg-[#F6F9FF]">
         <div class="container mx-auto text-center">
-{{--            <h2 class="text-2xl font-bold text-gray-800">Why choose GreenMap?</h2>--}}
+{{--            <h2 class="text-2xl font-bold text-gray-800">Why choose Farmore?</h2>--}}
 {{--            <p class="text-md mt-4 mb-24 text-gray-600">Here are many reasons you'll love using our platform</p>--}}
             <div class="flex justify-center mt-8 space-x-6 gap-20">
                 <!-- Icon -->
@@ -201,7 +201,7 @@
 
 {{--    <section class="py-20 bg-white">--}}
 {{--        <div class="container mx-auto text-center">--}}
-{{--            <h2 class="text-2xl font-bold text-gray-800">Who is GreenMap for?</h2>--}}
+{{--            <h2 class="text-2xl font-bold text-gray-800">Who is Farmore for?</h2>--}}
 {{--            <div class="flex flex-wrap justify-center mt-10">--}}
 {{--                <!-- Card 1 -->--}}
 {{--                <div class="w-[280px] p-4">--}}
