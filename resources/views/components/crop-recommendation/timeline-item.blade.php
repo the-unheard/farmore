@@ -1,4 +1,4 @@
-@props(['icon', 'label', 'value', 'color'])
+@props(['icon', 'label', 'value', 'color', 'class' => null])
 
 <div class="relative flex items-start space-x-4 mt-5">
     <div class="relative">
@@ -8,6 +8,6 @@
     </div>
     <div>
         <p class="text-sm text-gray-500">{{ $label }}</p>
-        <p class="text-gray-800 font-semibold text-sm">{{ $value }}</p>
+        <p class="text-gray-800 font-semibold text-sm {{ $class }}">{{ $value }}</p>
     </div>
 </div>

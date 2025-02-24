@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\CityClimate;
 use App\Models\CropData;
 use App\Models\CropRecommendation;
+use App\Models\CropYield;
+use App\Models\Plot;
 use Phpml\Classification\NaiveBayes;
 
 class RecommendationService
@@ -65,7 +67,7 @@ class RecommendationService
                 $plotSoilHealth->ph,
             ]);
 
-            return $this->getCropInformation($predictedCrop, $selectedPlot);
+            return $this->getCropInformation($predictedCrop, $selectedPlot, true);
 
         }
 
@@ -85,7 +87,7 @@ class RecommendationService
             ->pluck('crop_name');
 
         // Transform each crop name into detailed crop information
-        $cropsWithDetails = $cropNames->map(fn($crop) => $this->getCropInformation($crop, $selectedPlot));
+        $cropsWithDetails = $cropNames->map(fn($crop) => $this->getCropInformation($crop, $selectedPlot, false));
 
         return $cropsWithDetails;
     }
@@ -198,44 +200,42 @@ class RecommendationService
     }
 
     private function calculatePh($cropData, $selectedPlot) {
-
         $latestSoil = $selectedPlot->latestSoil;
 
         // check if there is no soil record at all
         if (!$latestSoil || is_null($latestSoil->ph)) {
-            return 'No soil record available';
+            return ['message' => 'No soil record available', 'tag' => null];
         }
 
         $min = $cropData->req_ph_min;
         $max = $cropData->req_ph_max;
 
         if ($latestSoil->ph < $min) {
-            return 'pH must be increased to ' . $min . ' to ' . $max;
+            return ['message' => 'pH must be increased to ' . $min . ' - ' . $max, 'tag' => 'increase_ph'];
         } elseif ($latestSoil->ph > $max) {
-            return 'pH must be decreased to ' . $max . ' to ' . $min;
+            return ['message' => 'pH must be decreased to ' . $min . ' - ' . $max, 'tag' => 'decrease_ph'];
         } else {
-            return 'pH is currently ideal';
+            return ['message' => 'pH is currently ideal', 'tag' => null];
         }
-        
     }
 
 
-    private function calculateNPK($cropData, $selectedPlot) {
 
+    private function calculateNPK($cropData, $selectedPlot) {
         $latestSoil = $selectedPlot->latestSoil;
 
         // check if no soil record at all
         if (!$latestSoil) {
-            return 'No soil record available';
+            return ['message' => 'No soil record available', 'prioritize' => []];
         }
 
         // check if any of the soil health values are null
         if (collect([
-                $latestSoil->nitrogen,
-                $latestSoil->phosphorus,
-                $latestSoil->potassium,
-            ])->contains(null)) {
-            return 'Not enough soil health data';
+            $latestSoil->nitrogen,
+            $latestSoil->phosphorus,
+            $latestSoil->potassium,
+        ])->contains(null)) {
+            return ['message' => 'Not enough soil health data', 'prioritize' => []];
         }
 
         // user's soil nutrients
@@ -260,42 +260,116 @@ class RecommendationService
         $normalizedCropP = $cropP / $minCropNPK;
         $normalizedCropK = $cropK / $minCropNPK;
 
-        //
         $prioritize = [];
 
         if ($normalizedUserN < $normalizedCropN) {
-            $prioritize[] = 'Nitrogen';
+            $prioritize[] = 'nitrogen';
         }
         if ($normalizedUserP < $normalizedCropP) {
-            $prioritize[] = 'Phosphorus';
+            $prioritize[] = 'phosphorus';
         }
         if ($normalizedUserK < $normalizedCropK) {
-            $prioritize[] = 'Potassium';
+            $prioritize[] = 'potassium';
         }
 
-        if (!empty($prioritize)) {
-            return 'Focus more on ' . implode(' and ', $prioritize);
+        if (empty($prioritize)) {
+            $prioritize = ['nitrogen', 'phosphorus', 'potassium'];
+            $message = 'Give a balanced amount of NPK';
         } else {
-            return 'Give a balanced amount of NPK';
+            $message = 'Focus more on ' . implode(' and ', array_map('ucfirst', $prioritize));
         }
+
+        return ['message' => $message, 'prioritize' => $prioritize];
+    }
+
+    private function getFertilizer(array $tags, $plotSize) {
+
+        if (empty($tags)) return 'No additional fertilization needed.';
+
+        // Start query with fertilizers
+        $query = \App\Models\FertilizerData::query();
+
+        // Ensure all given tags are TRUE
+        foreach ($tags as $tag) {
+            $query->where($tag, true);
+        }
+
+        // Ensure all other boolean columns are FALSE (so we don’t get extra nutrients)
+        $booleanColumns = ['nitrogen', 'phosphorus', 'potassium', 'increase_ph', 'decrease_ph'];
+        foreach ($booleanColumns as $col) {
+            if (!in_array($col, $tags)) {
+                $query->where($col, false);
+            }
+        }
+
+        // Fetch the first matching fertilizer
+        $fertilizer = $query->first();
+
+        if (!$fertilizer) return 'No suitable fertilizer found.';
+
+        // Calculate required amount for the plot size
+        $amount = ($fertilizer->per_hectare_min == $fertilizer->per_hectare_max)
+            ? ($fertilizer->per_hectare_min * $plotSize) . " {$fertilizer->per_hectare_unit}"
+            : ($fertilizer->per_hectare_min * $plotSize) . " to " . ($fertilizer->per_hectare_max * $plotSize) . " {$fertilizer->per_hectare_unit}";
+
+        return "You need $amount of " . trim($fertilizer->fertilizer_name, '"');
 
     }
 
-    public function getCropInformation($crop_name, $selectedPlot) {
 
+
+    public function getCropInformation($crop_name, $selectedPlot, $recommendedBySoilHealth = false) {
         // plot information
         $plotSize = $selectedPlot->hectare;
         $soilType = $selectedPlot->soil_type;
-
         $city = $selectedPlot->city;
         $climate = CityClimate::where('municipality', $city)->firstOrFail()->climate;
         $climateColumn = 'climate_' . $climate;
 
         // find the crop in CropData
         $cropData = CropData::where('crop_name', $crop_name)->first();
-
-        // decode the JSON list of ideal months
         $idealMonths = json_decode($cropData->$climateColumn, true);
+
+        // Reasons for recommendations
+        $reasons = [];
+        if ($recommendedBySoilHealth) $reasons[] = 'nutrients';
+        if (in_array(now()->month, $idealMonths)) $reasons[] = 'season';
+
+        // Get pH and NPK recommendations
+        $phRecommendation = $this->calculatePh($cropData, $selectedPlot);
+        $npkRecommendation = $this->calculateNPK($cropData, $selectedPlot);
+
+        if ($phRecommendation['message'] === 'pH is currently ideal') $reasons[] = 'ph level';
+        if ($this->checkIdealSoil($cropData, $soilType) === "Yes") $reasons[] = 'soil type';
+
+        // Get fertilizer recommendations
+        $phFertilizer = $this->getFertilizer([$phRecommendation['tag']], $plotSize);
+        $npkFertilizer = $this->getFertilizer($npkRecommendation['prioritize'], $plotSize);
+
+        // Get actual yield and expected yield from other farms
+        $currentYear = now()->year;
+        $cropYields = CropYield::where('crop', $crop_name)
+            ->whereYear('planting_date', $currentYear)
+            ->get();
+        $totalActualYield = $cropYields->whereNotNull('actual_yield')->sum('actual_yield');
+
+        $totalExpectedMin = 0;
+        $totalExpectedMax = 0;
+
+        foreach($cropYields->whereNull('actual_yield') as $yield) {
+            $plotHectare = Plot::where('id', $yield->plot_id)->value('hectare');
+            $totalExpectedMin += $cropData->yield_min * $plotHectare;
+            $totalExpectedMax += $cropData->yield_max * $plotHectare;
+        }
+
+        if ($totalExpectedMin === 0) {
+            $totalExpected = 'None';
+            $reasons[] = 'low competition';
+        } else if ($totalExpectedMin === $totalExpectedMax) {
+            $totalExpected = $totalExpectedMin . ' tons';
+        } else {
+            $totalExpected = $totalExpectedMin . ' - ' . $totalExpectedMax . ' tons';
+        }
 
         return [
             'crop_name' => $cropData->crop_name,
@@ -308,8 +382,18 @@ class RecommendationService
             'spacing_plant' => $this->calculateSpacingPlant($cropData),
             'spacing_row' => $this->calculateSpacingRow($cropData),
             'ideal_soonest_month' => $this->soonestIdealMonth($idealMonths),
-            'ph' => $this->calculatePh($cropData, $selectedPlot),
-            'npk' => $this->calculateNPK($cropData, $selectedPlot)
+            'ph' => $phRecommendation['message'],
+            'npk' => $npkRecommendation['message'],
+            'reasons' => $reasons,
+            'spacing_plant_min' => $cropData->spacing_plant_min,
+            'spacing_plant_max' => $cropData->spacing_plant_max,
+            'spacing_row_min' => $cropData->spacing_row_min,
+            'spacing_row_max' => $cropData->spacing_row_max,
+            'total_actual_yield' => $totalActualYield,
+            'total_expected' => $totalExpected,
+            'my_expected_max' => $cropData->yield_max * $plotSize,
+            'ph_fertilizer' => $phFertilizer,
+            'npk_fertilizer' => $npkFertilizer,
         ];
     }
 

@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             CityClimateSeeder::class,
             CropDataSeeder::class,
             UserSeeder::class,
+            FertilizerDataSeeder::class,
         ]);
     }
 }

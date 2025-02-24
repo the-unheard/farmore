@@ -47,3 +47,12 @@
 .checkbox-grad-blue {
     color: #4776E6;
 }
+
+.border-grad-blue {
+    border-width: 3px;
+    border-style: solid;
+    border-color: #4776E6;
+}
+
+
+
