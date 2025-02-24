@@ -18,12 +18,22 @@ class CropYieldFactory extends Factory
      */
     public function definition(): array
     {
+        // Get a random plot and its hectare size
+        $plot = Plot::inRandomOrder()->first();
+        $plotHectare = $plot->hectare;
+
+        // Get a random crop and its expected yield range
+        $crop = CropData::inRandomOrder()->first();
+        $yieldMin = $crop->yield_min * $plotHectare;
+        $yieldMax = $crop->yield_max * $plotHectare;
+
         return [
-            'plot_id' => Plot::inRandomOrder()->first()->id,
-            'crop' => CropData::inRandomOrder()->first()->crop_name,
-            'actual_yield' => $this->faker->optional(0.25)->numberBetween(100, 1000),
+            'plot_id' => $plot->id,
+            'crop' => $crop->crop_name,
+            'actual_yield' => $this->faker->optional(0.95)->numberBetween($yieldMin, $yieldMax), // 5% chance to be NULL
             'planting_date' => $plantingDate = $this->faker->dateTimeBetween('2025-01-01', '2025-01-31'),
             'harvest_date' => $this->faker->dateTimeBetween($plantingDate, '2025-03-31'),
         ];
     }
+
 }

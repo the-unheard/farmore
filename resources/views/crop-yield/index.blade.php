@@ -23,24 +23,30 @@
             <div id="most-planted-chart"></div>
         </div>
 
-        <!-- Highest Yields -->
-        <div class="w-3/12 bg-gray-50 rounded-lg shadow p-6">
-            <x-dashboard.header header="Highest Crop Yields"/>
-            <ul>
-                @foreach($highestCropYields as $cropYield)
-                    <li class="border-b border-dashed border-gray-200 last:border-b-0 last:mb-0">
-                        <a href="{{ url('crop-yield/' . $cropYield->id) }}" class="flex justify-between px-1 py-3 rounded-sm hover:bg-gray-200">
-                            <span class="text-gray-600 font-medium text-sm">{{ $cropYield->crop }}</span>
-                            <span class="text-gray-500 text-sm">{{ $cropYield->actual_yield }} Tons</span>
-                        </a>
-                    </li>
+        <!-- Best Crop Rotation -->
+        <div class="w-4/12 bg-gray-50 rounded-lg shadow p-6">
+            <x-dashboard.header header="Crop Pair Performance"/>
+            <table class="w-full border-none text-sm">
+                <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-left">Pair</th>
+                    <th class="px-4 py-2 text-left">Performance</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($bestRotationPairs as $pair)
+                    <tr class="hover:bg-gray-100">
+                        <td class="px-4 py-2 text-gray-600">{{ $pair['pair'] }}</td>
+                        <td class="px-4 py-2">{{ round($pair['averagePerformance'], 2) }}%</td>
+                    </tr>
                 @endforeach
-            </ul>
+                </tbody>
+            </table>
         </div>
 
         <!-- Best Yields Table -->
-        <div class="w-6/12 bg-gray-50 rounded-lg shadow p-6">
-            <x-dashboard.header header="Best Crop Yields"/>
+        <div class="w-5/12 bg-gray-50 rounded-lg shadow p-6">
+            <x-dashboard.header header="Individual Crop Performance"/>
 
             <table class="w-full border-none text-sm">
                 <thead>

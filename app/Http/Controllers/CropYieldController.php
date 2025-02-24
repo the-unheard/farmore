@@ -17,29 +17,30 @@ class CropYieldController extends Controller
 {
     public function index(Request $request)
     {
-        // get the current logged-in user
+        // Get the current logged-in user
         $user = auth()->user();
 
-        // get the user's plots using eloquent model relationship
+        // Get the user's plots using Eloquent model relationship
         $plots = $user->plot;
 
-        // validate if user has plots
+        // Validate if user has plots
         if ($plots->isEmpty()) {
             return redirect()->route('plot.index')->with('warning', 'You must create a Plot first.');
         }
 
-        // checks for request parameter (/index?plot_id={id}), then fall back is first plot in database
+        // Checks for request parameter (/index?plot_id={id}), then fall back to the first plot in the database
         $selectedPlot = $request->input('plot_id', $plots->first()->id);
 
-        // gets crop yield record for table and chart
+        // Gets crop yield record for table and chart
         $yields = CropYield::where('plot_id', $selectedPlot)->orderBy('planting_date', 'desc')->paginate(10);
         $latestCropYields = CropYield::where('plot_id', $selectedPlot)
             ->whereNotNull('yield')->whereNotNull('harvest_date')
             ->orderBy('harvest_date', 'desc')
             ->take(15)->get()->sortBy('harvest_date');
 
+        // Get the best crop yields
         $bestCropYields = CropYield::where('plot_id', $selectedPlot)
-            ->get() // Get all records first
+            ->get()
             ->map(function ($yield) use ($selectedPlot) {
                 // Get expected yield range from CropData
                 $cropData = CropData::where('crop_name', $yield->crop)->first();
@@ -64,23 +65,66 @@ class CropYieldController extends Controller
                     'performance' => round($performance, 2) // % of expected max yield
                 ];
             })
-            ->sortByDesc('performance') // sort by best performance
-            ->take(8) // keep top 8 performers
-            ->values(); // reset keys for clean output
+            ->sortByDesc('performance') // Sort by best performance
+            ->take(8) // Keep top 8 performers
+            ->values(); // Reset keys for clean output
+
+        // Get the top best pairs for crop rotation
+        $cropRotationPairs = [];
+
+        // Get sorted crop yields with valid yield data
+        $sortedYields = $latestCropYields->filter(fn($yield) => !is_null($yield->actual_yield));
+        $sortedYields = $sortedYields->values();
+
+        // Iterate over consecutive crops to form pairs
+        for ($i = 0; $i < $sortedYields->count() - 1; $i++) {
+            $cropA = $sortedYields[$i]->crop;
+            $cropB = $sortedYields[$i + 1]->crop;
+
+            // Normalize the pair (A → B and B → A are the same)
+            $pair = collect([$cropA, $cropB])->sort()->values()->implode(' and ');
+
+            // Compute performance for the pair
+            $performanceA = $bestCropYields->firstWhere('crop_name', $cropA)['performance'] ?? 0;
+            $performanceB = $bestCropYields->firstWhere('crop_name', $cropB)['performance'] ?? 0;
+            $averagePerformance = ($performanceA + $performanceB) / 2;
+
+            // Convert collection to an array before modification
+            if (!isset($cropRotationPairs[$pair])) {
+                $cropRotationPairs[$pair] = [
+                    'pair' => $pair,
+                    'totalPerformance' => 0,
+                    'count' => 0,
+                ];
+            }
+
+            // Update the pair's data
+            $cropRotationPairs[$pair]['totalPerformance'] += $averagePerformance;
+            $cropRotationPairs[$pair]['count']++;
+        }
+
+        // Calculate the average performance for each pair
+        $cropRotationPairs = array_map(fn($data) => [
+            'pair' => $data['pair'],
+            'averagePerformance' => $data['totalPerformance'] / $data['count'],
+        ], $cropRotationPairs);
+
+        // Get the top best-performing crop rotation pairs
+        $bestRotationPairs = collect($cropRotationPairs)->sortByDesc('averagePerformance')->take(8)->values();
 
         return view('crop-yield.index', [
-            'yields' => $yields, // for displaying crop yield records
-            'plots' => $plots, // for displaying plot names on the dropdown
-            'selectedPlot' => $selectedPlot, // for the Add New crop yield record button
-            'latestCropYields' => $latestCropYields, // for displaying the chart
-            'highestCropYields' => CropYield::where('plot_id', $selectedPlot)
-                ->orderBy('actual_yield', 'desc')->take(8)->get(),
+            'yields' => $yields,
+            'plots' => $plots,
+            'selectedPlot' => $selectedPlot,
+            'latestCropYields' => $latestCropYields,
             'mostPlantedCrops' => CropYield::where('plot_id', $selectedPlot)
                 ->select('crop', DB::raw('COUNT(*) as crop_count'))->groupBy('crop')
                 ->orderBy('crop_count', 'desc')->take(5)->get(),
             'bestCropYields' => $bestCropYields,
+            'bestRotationPairs' => $bestRotationPairs,
         ]);
     }
+
 
     public function show(CropYield $crop_yield)
     {
@@ -308,6 +352,8 @@ class CropYieldController extends Controller
             } else {
                 return 'pH is currently ideal';
             }
+        } else {
+            return 'No record';
         }
     }
 
