@@ -21,7 +21,7 @@ class CropYieldFactory extends Factory
         return [
             'plot_id' => Plot::inRandomOrder()->first()->id,
             'crop' => CropData::inRandomOrder()->first()->crop_name,
-            'actual_yield' => $this->faker->numberBetween(100, 1000),
+            'actual_yield' => $this->faker->optional(0.25)->numberBetween(100, 1000),
             'planting_date' => $plantingDate = $this->faker->dateTimeBetween('2025-01-01', '2025-01-31'),
             'harvest_date' => $this->faker->dateTimeBetween($plantingDate, '2025-03-31'),
         ];

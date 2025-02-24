@@ -39,7 +39,6 @@
                                 <x-crop-recommendation.timeline-item value="Checking..." label="Is the weather ideal?" icon="fa-cloud-sun" color="text-sky-500" class="weather-ideal"/>
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['seeds_needed'] }}" label="How many seeds are needed?" icon="fa-cubes-stacked" color="text-lime-500"/>
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['density'] }}" label="How many plants to grow?" icon="fa-seedling" color="text-green-500"/>
-
                             </div>
                             <div class="w-1/3 relative py-2">
                                 <div class="absolute w-0.5 bg-gray-300 h-72 left-4 top-10"></div>
@@ -48,7 +47,6 @@
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['yield'] }}" label="What is the expected yield?" icon="fa-dolly" color="text-zinc-500"/>
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['total_actual_yield'] . ' tons'}}" label="How much have others harvested recently?" icon="fa-dolly" color="text-green-500"/>
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['total_expected'] }}" label="How much is expected to be harvested soon?" icon="fa-dolly" color="text-amber-500"/>
-
                             </div>
                             <div class="w-1/3 relative py-2">
                                 <div class="absolute w-0.5 bg-gray-300 h-72 left-4 top-10"></div>
@@ -58,7 +56,6 @@
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['ph_fertilizer'] }}" label="Which pH fertilizer is ideal?" icon="fa-spray-can-sparkles" color="text-teal-500"/>
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['maturity'] }}" label="How long until harvest?" icon="fa-carrot" color="text-amber-500"/>
                             </div>
-
                         </div>
                     </div>
                 @endforeach
@@ -68,57 +65,58 @@
                 <h2 class="text-lg font-semibold text-gray-800">No crop recommendations available</h2>
             </div>
         @endif
-    </div>
+        <div class="flex space-x-4 bg-gray-50 border-t border-gray-200 px-4 pt-7 pb-4 mt-4">
+            <!-- Left: Polygon Plot -->
+            <div class="w-5/12">
+                <h2 class="text-base font-semibold text-gray-800">Plot Grid</h2>
+                <canvas id="polygonCanvas" width="650" height="650" class="border rounded-lg mt-2"></canvas>
+            </div>
 
-    <div class="flex space-x-4 bg-gray-50 rounded-lg shadow p-3">
-        <!-- Left: Polygon Plot -->
-        <div class="w-5/12">
-            <h2 class="text-base font-semibold text-gray-800">Plot Grid</h2>
-            <canvas id="polygonCanvas" width="650" height="650" class="border rounded-lg mt-2"></canvas>
-        </div>
+            <!-- Middle: Controls -->
+            <div class="w-2/12 py-7">
+                <!-- Plot Grid Toggle -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm py-2">Plot Grid Size</label>
+                    <div class="flex rounded-lg bg-gray-200 p-2">
+                        <button id="plotGrid10m" class="w-1/2 text-sm font-semibold px-4 py-1 rounded bg-white shadow text-gray-800 hover:text-gray-800">10m<sup>2</sup></button>
+                        <button id="plotGrid1m" class="w-1/2 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">1m<sup>2</sup></button>
+                    </div>
+                </div>
 
-        <!-- Middle: Controls -->
-        <div class="w-2/12 py-7">
-            <!-- Plot Grid Toggle -->
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm py-2">Plot Grid Size</label>
-                <div class="flex rounded-lg bg-gray-200 p-2">
-                    <button id="plotGrid10m" class="w-1/2 text-sm font-semibold px-4 py-1 rounded bg-white shadow text-gray-800 hover:text-gray-800">10m<sup>2</sup></button>
-                    <button id="plotGrid1m" class="w-1/2 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">1m<sup>2</sup></button>
+                <!-- Crop Grid Toggle -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm py-2">Crop Spacing Area</label>
+                    <div class="flex rounded-lg bg-gray-200 p-2">
+                        <button id="cropGrid10m" class="w-1/3 text-sm font-semibold px-4 py-1 rounded bg-white shadow text-gray-800 hover:text-gray-800">10m<sup>2</sup></button>
+                        <button id="cropGrid1m" class="w-1/3 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">1m<sup>2</sup></button>
+                        <button id="cropGrid0_1m" class="w-1/3 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">0.1m<sup>2</sup></button>
+                    </div>
+                </div>
+
+                <!-- Plant Spacing Slider -->
+                <div id="spacingPlantSlider">
+                    <label class="block text-gray-700 text-sm py-2">Plant Spacing (<span id="plantSpacingValue">25 cm</span>)</label>
+                    <input type="range" id="plantSpacingSlider" min="10" max="40" value="25" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer my-4">
+                </div>
+
+                <!-- Row Spacing Slider -->
+                <div id="spacingRowSlider">
+                    <label class="block text-gray-700 text-sm py-2">Row Spacing (<span id="rowSpacingValue">25 cm</span>)</label>
+                    <input type="range" id="rowSpacingSlider" min="10" max="40" value="25" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer my-4">
                 </div>
             </div>
 
-            <!-- Crop Grid Toggle -->
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm py-2">Crop Spacing Area</label>
-                <div class="flex rounded-lg bg-gray-200 p-2">
-                    <button id="cropGrid10m" class="w-1/3 text-sm font-semibold px-4 py-1 rounded bg-white shadow text-gray-800 hover:text-gray-800">10m<sup>2</sup></button>
-                    <button id="cropGrid1m" class="w-1/3 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">1m<sup>2</sup></button>
-                    <button id="cropGrid0_1m" class="w-1/3 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">0.1m<sup>2</sup></button>
+            <!-- Right: 1m x 1m Grid -->
+            <div class="w-5/12">
+                <div class="text-base text-gray-800 font-semibold mb-2">
+                    <span id="cropGridLabel">Crop Spacing</span>
                 </div>
+                <canvas id="cropLayoutCanvas" width="650" height="650" class="border rounded-lg mt-2"></canvas>
             </div>
-
-            <!-- Plant Spacing Slider -->
-            <div id="spacingPlantSlider">
-                <label class="block text-gray-700 text-sm py-2">Plant Spacing (<span id="plantSpacingValue">25 cm</span>)</label>
-                <input type="range" id="plantSpacingSlider" min="10" max="40" value="25" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer my-4">
-            </div>
-
-            <!-- Row Spacing Slider -->
-            <div id="spacingRowSlider">
-                <label class="block text-gray-700 text-sm py-2">Row Spacing (<span id="rowSpacingValue">25 cm</span>)</label>
-                <input type="range" id="rowSpacingSlider" min="10" max="40" value="25" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer my-4">
-            </div>
-        </div>
-
-        <!-- Right: 1m x 1m Grid -->
-        <div class="w-5/12">
-            <div class="text-base text-gray-800 font-semibold mb-2">
-                <span id="cropGridLabel">Crop Spacing</span>
-            </div>
-            <canvas id="cropLayoutCanvas" width="650" height="650" class="border rounded-lg mt-2"></canvas>
         </div>
     </div>
+
+
 
 
 </x-layout>

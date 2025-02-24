@@ -205,7 +205,7 @@ class SoilController extends Controller
         return collect($this->calculateRateOfChange($nutrientData))->reverse();
     }
 
-    // rate of change
+    // Rate of change
     private function calculateRateOfChange($data)
     {
         $rateOfChange = [];
@@ -214,7 +214,13 @@ class SoilController extends Controller
 
         foreach ($data as $date => $value) {
             if ($previousValue !== null) {
-                $percentageChange = (($value - $previousValue) / $previousValue) * 100;
+                // Prevent division by zero error
+                if ($previousValue != 0) {
+                    $percentageChange = (($value - $previousValue) / $previousValue) * 100;
+                } else {
+                    $percentageChange = 0; // Set change to 0 if the previous value was 0
+                }
+
                 $daysDifference = Carbon::parse($previousDate)->diffInDays($date);
 
                 $rateOfChange[] = [
@@ -229,5 +235,6 @@ class SoilController extends Controller
         }
         return $rateOfChange;
     }
+
 
 }

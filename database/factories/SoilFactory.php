@@ -19,12 +19,12 @@ class SoilFactory extends Factory
     {
         return [
             'plot_id' => Plot::inRandomOrder()->first()->id,
-            'nitrogen' => $this->faker->numberBetween(0, 140),
-            'phosphorus' => $this->faker->numberBetween(0, 145),
-            'potassium' => $this->faker->numberBetween(0, 205),
-            'temperature' => $this->faker->randomFloat(2,0, 50),
+            'nitrogen' => $this->faker->numberBetween(1, 140),
+            'phosphorus' => $this->faker->numberBetween(1, 145),
+            'potassium' => $this->faker->numberBetween(1, 205),
+            'temperature' => $this->faker->randomFloat(2,1, 50),
             'humidity' => $this->faker->randomFloat(2,10, 100),
-            'ph' => $this->faker->randomFloat(2,0, 10),
+            'ph' => $this->faker->randomFloat(2,1, 10),
             'record_date' => $this->faker->dateTimeBetween('2023-01-01', '2024-09-31')
         ];
     }
