@@ -6,6 +6,7 @@ use App\Models\CityClimate;
 use App\Models\Plot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class PlotController extends Controller
 {
@@ -81,6 +82,13 @@ class PlotController extends Controller
             $data['coordinates'] = json_decode($data['coordinates'], true);
         }
 
+        // Generate plot_token
+        if (empty($data['plot_token'])) {
+            do {
+                $data['plot_token'] = Str::random(16);
+            } while (\App\Models\Plot::where('plot_token', $data['plot_token'])->exists()); // Ensure uniqueness
+        }
+
         // Now validate the $data array
         return validator($data, [
             'user_id' => ['required', 'integer'],
@@ -96,6 +104,9 @@ class PlotController extends Controller
             'coordinates' => ['required', 'array'],
             'coordinates.*' => ['array', 'size:2'],
             'coordinates.*.*' => ['numeric'],
+
+            // Ensure plot_token is validated
+            'plot_token' => ['required', 'string', 'size:16', 'unique:plots,plot_token'],
         ])->validate(); // Use the validator with the $data array
     }
 
