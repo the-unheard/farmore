@@ -24,6 +24,7 @@ return new class extends Migration
             $table->integer('climate')->nullable();
             $table->float('hectare');
             $table->boolean('public');
+            $table->string('plot_token', 32)->unique();
             $table->timestamps();
         });
     }

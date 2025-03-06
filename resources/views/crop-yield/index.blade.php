@@ -120,11 +120,13 @@
 
     <script>
         const cropYieldData = {
-            id: @json($latestCropYields->pluck('id')),
-            crop: @json($latestCropYields->pluck('crop')),
-            cropYield: @json($latestCropYields->pluck('actual_yield')),
-            harvestDates: @json($latestCropYields->pluck('harvest_date')->map(fn($date) => $date->format('m-d-Y')))
+            id: @json(collect($latestCropYields)->pluck('id')),
+            crop: @json(collect($latestCropYields)->pluck('crop_name')),
+            performance: @json(collect($latestCropYields)->pluck('performance')),
+            harvestDates: @json(collect($latestCropYields)->pluck('harvest_date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('m-d-Y')))
         };
+
+        console.log(cropYieldData);
 
         const mostPlantedData = {
             crop: @json($mostPlantedCrops->pluck('crop')),

@@ -19,7 +19,7 @@
                     <x-breadcrumb-current>Plot Record # {{ $plot->id }}</x-breadcrumb-current>
                 </x-breadcrumb-container>
 
-                <!-- ROW -->
+                <!-- Main Details and Map -->
                 <div class="w-full flex gap-5">
                     <div class="w-1/2 flex flex-col gap-5">
                         <div class="flex gap-5">
@@ -31,31 +31,54 @@
                             <x-map.show-star-input :action="$plot->id" :plot="$plot"/>
                         </div>
                         <div class="bg-gray-100 text-gray-500 p-4 rounded-lg shadow-sm">
-                            <label class="block text-sm font-medium">Soil Health</label>
+                            <label class="mb-2 block text-sm font-medium">Soil Health</label>
                             <div class="flex gap-5">
-                                <!-- N -->
-                                <div class="w-1/2 flex items-center justify-between my-4 p-6 border-r">
-                                    <div>
-                                        <i class="p-2 bg-gray-600 w-8 text-center rounded fas fa-n text-white"></i>
-                                        <span class="ml-1">Nitrogen</span>
-                                    </div>
-                                    <span>50</span>
-                                </div>
-                                <!-- P -->
-                                <div class="w-1/2 flex items-center justify-between my-4">
-                                    <div>
-                                        <i class="p-2 bg-gray-600 w-8 text-center rounded fas fa-n text-white"></i>
-                                        <span class="ml-1">Nitrogen</span>
-                                    </div>
-                                    <span>50</span>
-                                </div>
+                                <x-map.show-info-soil icon="fa-n" label="Nitrogen" value="{{ $latest_soil['nitrogen'] }}"/>
+                                <x-map.show-info-soil icon="fa-gauge-simple " label="pH" value="{{ $latest_soil['ph'] }}"/>
+                            </div>
+                            <div class="flex gap-5">
+                                <x-map.show-info-soil icon="fa-p" label="Phosphorus" value="{{ $latest_soil['phosphorus'] }}"/>
+                                <x-map.show-info-soil icon="fa-droplet" label="Humidity" value="{{ $latest_soil['humidity'] }}"/>
+                            </div>
+                            <div class="flex gap-5">
+                                <x-map.show-info-soil icon="fa-k" label="Potassium" value="{{ $latest_soil['potassium'] }}"/>
+                                <x-map.show-info-soil icon="fa-temperature-half" label="Temperature" value="{{ $latest_soil['temperature'] }}"/>
                             </div>
                         </div>
-
                     </div>
 
-                    <div class="relative w-1/2 h-[600px] mb-4 bg-gray-50 rounded-lg shadow p-2 ">
+                    <div class="relative w-1/2 h-[465px] mb-4 bg-gray-100 rounded-lg shadow-sm p-2 ">
                         <div id="map" class="w-full absolute"></div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="relative overflow-x-auto sm:rounded-lg">
+                    <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-300">
+                        <tr>
+                            <x-table-header>Crop</x-table-header>
+                            <x-table-header>Yield (Tons)</x-table-header>
+                            <x-table-header>Planting Date</x-table-header>
+                            <x-table-header>Harvest Date</x-table-header>
+                            <x-table-header>Performance</x-table-header>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach ($crop_yields as $yield)
+                            <tr class="border-b text-gray-700 bg-gray-50 border-gray-200 hover:bg-gray-100">
+                                <td class="px-3 py-4">{{ $yield['crop_name'] }}</td>
+                                <td class="px-3 py-4">{{ $yield['actual_yield'] }}</td>
+                                <td class="px-3 py-4">{{ $yield['planting_date'] }}</td>
+                                <td class="px-3 py-4">{{ $yield['harvest_date'] }}</td>
+                                <td class="px-3 py-4">{{ $yield['performance'] }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+
+                    <div class="mt-4">
+                        {{ $crop_yields->links() }} <!-- Pagination links -->
                     </div>
                 </div>
 

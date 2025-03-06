@@ -44,7 +44,6 @@ Route::post('/auth/logout', [SessionController::class, 'destroy']);
 // crop recommendation
 Route::resource('crop-recommendation', CropRecommendationController::class)->only(['index', 'store'])->middleware('auth');
 
-
 // soil health - complete
 //Route::get('/soil', [SoilController::class, 'index']);
 //Route::get('/soil/create', [SoilController::class, 'create']);

@@ -19,7 +19,7 @@ class CustomSeeder extends Seeder
     {
         User::factory(10)->create();
         Plot::factory(50)->create();
-        Soil::factory(200)->create();
+        Soil::factory(600)->create();
         CropYield::factory(600)->create();
         Rating::factory(400)->create();
 

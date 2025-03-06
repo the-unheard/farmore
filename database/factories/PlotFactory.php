@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\CityClimate;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Plot>
@@ -55,6 +56,7 @@ class PlotFactory extends Factory
             'city' => CityClimate::inRandomOrder()->first()->municipality,
             'hectare' => $this->faker->numberBetween(1, 5),
             'public' => 1,
+            'plot_token' => Str::random(16),
         ];
     }
 

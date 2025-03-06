@@ -45,8 +45,8 @@
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['spacing_plant'] }}" label="What's the ideal plant spacing?" icon="fa-braille" color="text-stone-500"/>
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['spacing_row'] }}" label="What's the ideal row spacing?" icon="fa-braille" color="text-stone-500"/>
                                 <x-crop-recommendation.timeline-item value="{{ $recommendation['yield'] }}" label="What is the expected yield?" icon="fa-dolly" color="text-zinc-500"/>
-                                <x-crop-recommendation.timeline-item value="{{ $recommendation['total_actual_yield'] . ' tons'}}" label="How much have others harvested recently?" icon="fa-dolly" color="text-green-500"/>
-                                <x-crop-recommendation.timeline-item value="{{ $recommendation['total_expected'] }}" label="How much is expected to be harvested soon?" icon="fa-dolly" color="text-amber-500"/>
+                                <x-crop-recommendation.timeline-item value="{{ $recommendation['total_actual_yield'] . ' tons'}}" label="How much have other farms harvested recently?" icon="fa-dolly" color="text-green-500"/>
+                                <x-crop-recommendation.timeline-item value="{{ $recommendation['total_expected'] }}" label="How much are other farms expecting to harvest soon?" icon="fa-dolly" color="text-amber-500"/>
                             </div>
                             <div class="w-1/3 relative py-2">
                                 <div class="absolute w-0.5 bg-gray-300 h-72 left-4 top-10"></div>

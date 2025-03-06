@@ -26,6 +26,11 @@ class Plot extends Model
         return $this->hasOne(Soil::class)->latestOfMany();
     }
 
+    public function latestYield()
+    {
+        return $this->hasOne(CropYield::class)->latestOfMany();
+    }
+
     public function cropyield()
     {
         return $this->hasMany(CropYield::class);

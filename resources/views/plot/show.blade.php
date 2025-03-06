@@ -27,7 +27,8 @@
                     <x-show-info label="Hectare" icon="fa-vector-square">{{  $plot->hectare }}</x-show-info>
                     <x-show-info label="Soil Type" icon="fa-mound">{{  ucwords($plot->soil_type) }}</x-show-info>
                     <x-show-info label="Public" icon="fa-earth-asia">{{  ($plot->public ?? 1) == 1 ? 'Yes' : 'No' }}</x-show-info>
-                    <x-show-info label="Description" icon="fa-file-lines" colspan="col-span-4">{{  $plot->description }}</x-show-info>
+                    <x-show-info label="Token" icon="fa-code" colspan="col-span-4">{{  $plot->plot_token }}</x-show-info>
+                    <x-show-info label="Description" icon="fa-file-lines" colspan="col-span-6">{{  $plot->description }}</x-show-info>
                 </div>
             </div>
         </div>

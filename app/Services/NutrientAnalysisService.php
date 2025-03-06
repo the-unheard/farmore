@@ -86,13 +86,15 @@ class NutrientAnalysisService
     // predict each nutrient
     public function predictNutrientLevel($nutrientColumn, $selectedPlot): ?float
     {
-        // fetch the most recent 5 records (or less) for the selected plot, ordered by record date
+        // Fetch the most recent 5 days of records (or less) for the selected plot,
+        // ensuring only the latest record per day is included, ordered by record date.
         $recentData = Soil::where('plot_id', $selectedPlot)
-            ->whereNotNull($nutrientColumn) // Ensure the nutrient column is not null
-            ->where($nutrientColumn, '!=', '') // Ensure the nutrient column is not empty
+            ->whereNotNull($nutrientColumn)
+            ->whereRaw('record_date IN (SELECT MAX(record_date) FROM soils WHERE plot_id = ? GROUP BY DATE(record_date))', [$selectedPlot])
             ->orderBy('record_date', 'desc')
             ->take(5)
             ->get(['record_date', $nutrientColumn]);
+
 
         // If there are less than 5 records, we can't perform a regression
         if ($recentData->count() < 5) {

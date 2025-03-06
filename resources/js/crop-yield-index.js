@@ -2,20 +2,20 @@
 const cropData = cropYieldData || {};
 const mostPlantedObject = mostPlantedData || {};
 
-// most planted crops data
+// Most planted crops data
 const cropMost = mostPlantedObject.crop || [];
 const cropCountMost = mostPlantedObject.crop_count || [];
 
 // Access the crop yield data directly
 const idData = cropData.id || [];
 const cropNameData = cropData.crop || [];
-const yieldData = cropData.cropYield || [];
+const performanceData = cropData.performance || []; // ✅ Use Performance Instead of Yield
 const harvestDate = cropData.harvestDates || [];
 
-// Map cropData and yieldData into the required format for ApexCharts
+// Map cropNameData and performanceData into the required format for ApexCharts
 const chartData = cropNameData.map((crop, index) => ({
     x: crop,
-    y: yieldData[index] || 0, // If yieldData is shorter, default to 0 for missing values
+    y: performanceData[index] || 0, // If performanceData is shorter, default to 0 for missing values
     date: harvestDate[index],
     id: idData[index]
 }));
@@ -28,7 +28,10 @@ const optionsColumns = {
             borderRadius: 8,
         },
     },
-    series: [{ data: yieldData }],
+    series: [{
+        name: "Performance (%)", // ✅ Updated to show performance percentage
+        data: performanceData
+    }],
     chart: {
         type: "bar",
         height: 250,
@@ -51,7 +54,12 @@ const optionsColumns = {
                 return value + '<br/><b>' + date + '</b>'; // Format the tooltip text
             }
         },
-        y: { title: { formatter: function(value) { return '';  } } } // formats the tooltip text
+        y: {
+            formatter: function(value) {
+                return value.toFixed(2) + "%"; // ✅ Show Performance as a Percentage
+            },
+            title: { formatter: function() { return 'Performance'; } }
+        }
     },
     colors: ['#8E54E9'],
     fill: {
@@ -65,7 +73,7 @@ const optionsColumns = {
 
 };
 
-// most frequently planted
+// Most frequently planted
 const optionsMostPlanted = {
     colors: [
         "#4776E6",
@@ -105,7 +113,7 @@ const optionsMostPlanted = {
     tooltip: { fillSeriesColor: false, }
 }
 
-// render function
+// Render function
 const renderChart = (elementId, options) => {
     if (document.getElementById(elementId) && typeof ApexCharts !== 'undefined') {
         const chart = new ApexCharts(document.getElementById(elementId), options);

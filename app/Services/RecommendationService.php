@@ -180,7 +180,9 @@ class RecommendationService
         $min = $cropData->spacing_row_min;
         $max = $cropData->spacing_row_max;
 
-        if ($min < $max) {
+        if ($min === '') {
+            return 'Row spacing not available';
+        } else if ($min < $max) {
             return $min . ' to ' . $max . ' cm';
         } else {
             return $min . ' cm';
