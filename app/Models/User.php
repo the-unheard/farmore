@@ -53,4 +53,22 @@ class User extends Authenticatable
             $query->where('public', 1);
         });
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            // delete all plots first
+            $user->plots()->each(function ($plot) {
+                $plot->rating()->delete();
+                $plot->cropyield()->delete();
+                $plot->soil()->delete();
+                $plot->delete();
+            });
+
+            $user->rating()->delete();
+        });
+    }
+
 }

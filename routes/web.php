@@ -3,6 +3,7 @@
 use App\Http\Controllers\CropRecommendationController;
 use App\Http\Controllers\CropYieldController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ManageUserController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\PlotController;
 use App\Http\Controllers\RatingController;
@@ -43,6 +44,9 @@ Route::post('/auth/logout', [SessionController::class, 'destroy']);
 
 // crop recommendation
 Route::resource('crop-recommendation', CropRecommendationController::class)->only(['index', 'store'])->middleware('auth');
+
+// manage users
+Route::resource('/manage-users', ManageUserController::class)->only(['index', 'show'])->middleware('role:admin');
 
 // soil health - complete
 //Route::get('/soil', [SoilController::class, 'index']);
