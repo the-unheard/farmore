@@ -146,7 +146,7 @@
                 <div class="w-7/12 mx-auto">
                     <h3 class="text-2xl font-semibold text-gray-700">Interactive map</h3>
                     <p class="mt-4 text-gray-600">
-                        Discover public farm plots with soil health data and crop suggestions
+                        Discover public farm plots with soil health data and crop history
                     </p>
                 </div>
             </div>
@@ -158,42 +158,56 @@
         <div class="container max-w-5xl py-14 mx-auto flex flex-row-reverse items-center gradient-border-bottom">
             <div class="w-full md:w-1/2">
                 <div class="w-7/12 mx-auto">
-                    <h3 class="text-2xl font-semibold text-gray-700">Weather forecast</h3>
+                    <h3 class="text-2xl font-semibold text-gray-700">Custom Plot Drawing</h3>
                     <p class="mt-4 text-gray-600">
-                        Get real-time weather updates to plan your farming activities effectively
+                        Draw farm plots using an intuitive polygon tool on the interactive map
                     </p>
                 </div>
             </div>
             <div class="w-full md:w-1/2 text-center">
-                <i class="fa-solid fa-cloud-sun-rain text-9xl text-grad-blue"></i>
+                <i class="fa-solid fa-draw-polygon text-9xl text-grad-blue"></i>
+            </div>
+        </div>
+
+        <div class="container max-w-5xl py-14 mx-auto flex flex-row items-center gradient-border-bottom">
+            <div class="w-full md:w-1/2">
+                <div class="w-7/12 mx-auto">
+                    <h3 class="text-2xl font-semibold text-gray-700">Soil Nutrient Prediction</h3>
+                    <p class="mt-4 text-gray-600">
+                        Use predictive analytics to predict soil nutrients and optimize fertilization
+                    </p>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 text-center">
+                <i class="fa-solid fa-chart-line text-9xl text-grad-blue"></i>
+            </div>
+        </div>
+
+        <div class="container max-w-5xl py-14 mx-auto flex flex-row-reverse items-center gradient-border-bottom">
+            <div class="w-full md:w-1/2">
+                <div class="w-7/12 mx-auto">
+                    <h3 class="text-2xl font-semibold text-gray-700">Yield Performance</h3>
+                    <p class="mt-4 text-gray-600">
+                        See how your crop yield measures up based on farm size and expected averages
+                    </p>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 text-center">
+                <i class="fa-solid fa-scale-balanced text-9xl text-grad-blue"></i>
             </div>
         </div>
 
         <div class="container max-w-5xl py-14 mx-auto flex flex-col md:flex-row items-center gradient-border-bottom">
             <div class="w-full md:w-1/2">
                 <div class="w-7/12 mx-auto">
-                    <h3 class="text-2xl font-semibold text-gray-700">Crop recommendation</h3>
+                    <h3 class="text-2xl font-semibold text-gray-700">Recommendations</h3>
                     <p class="mt-4 text-gray-600">
-                        Receive tailored crop suggestions based on soil health using machine learning
+                        Get tailored crop, fertilizer, and planting suggestions based on your data
                     </p>
                 </div>
             </div>
             <div class="w-full md:w-1/2 text-center">
                 <i class="fa-solid fa-seedling text-9xl text-grad-blue"></i>
-            </div>
-        </div>
-
-        <div class="container max-w-5xl py-14 mx-auto flex flex-row-reverse items-center">
-            <div class="w-full md:w-1/2">
-                <div class="w-7/12 mx-auto">
-                    <h3 class="text-2xl font-semibold text-gray-700">Knowledge Base</h3>
-                    <p class="mt-4 text-gray-600">
-                        Access insights, guides, and best practices for improving farm performance
-                    </p>
-                </div>
-            </div>
-            <div class="w-full md:w-1/2 text-center">
-                <i class="fa-solid fa-book text-9xl text-grad-blue"></i>
             </div>
         </div>
 
@@ -250,7 +264,7 @@
     <!-- Footer -->
     <footer class="bg-gray-800 py-6">
         <div class="text-sm container mx-auto text-center text-white">
-            <p>&copy; 2024 {{ config('app.brand_name') }}. All rights reserved.</p>
+            <p>&copy; 2025 {{ config('app.brand_name') }}. All rights reserved.</p>
         </div>
     </footer>
 
