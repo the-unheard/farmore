@@ -197,7 +197,7 @@
             </div>
         </div>
 
-        <div class="container max-w-5xl py-14 mx-auto flex flex-col md:flex-row items-center gradient-border-bottom">
+        <div class="container max-w-5xl py-14 mx-auto flex flex-col md:flex-row items-center">
             <div class="w-full md:w-1/2">
                 <div class="w-7/12 mx-auto">
                     <h3 class="text-2xl font-semibold text-gray-700">Recommendations</h3>
