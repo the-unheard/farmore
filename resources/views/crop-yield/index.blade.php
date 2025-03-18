@@ -126,8 +126,6 @@
             harvestDates: @json(collect($latestCropYields)->pluck('harvest_date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('m-d-Y')))
         };
 
-        console.log(cropYieldData);
-
         const mostPlantedData = {
             crop: @json($mostPlantedCrops->pluck('crop')),
             crop_count: @json($mostPlantedCrops->pluck('crop_count')),

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CropData;
 use App\Models\CropYield;
 use App\Models\Plot;
 use App\Models\Soil;
@@ -36,22 +37,55 @@ class DashboardController extends Controller
         $nutrientAnalysis = $this->nutrientAnalysisService->getAllNutrientAnalysis($mostRecentSoilHealth, $mostRecentCropPlanted);
         $nutrientPredictions = $this->nutrientAnalysisService->predictAllNutrientLevel($selectedPlot);
 
+        // Get crop yields and calculate performance
+        $allCropYields = CropYield::where('plot_id', $selectedPlot)
+            ->orderBy('planting_date', 'desc')
+            ->get()
+            ->map(function ($yield) use ($selectedPlot) {
+                $cropData = CropData::where('crop_name', $yield->crop)->first();
+
+                if (!$cropData) {
+                    return null; // Skip if crop data is missing
+                }
+
+                $expectedMinYield = $cropData->yield_min * Plot::where('id', $selectedPlot)->value('hectare');
+                $expectedMaxYield = $cropData->yield_max * Plot::where('id', $selectedPlot)->value('hectare');
+
+                $performance = $expectedMaxYield > 0 ? ($yield->actual_yield / $expectedMaxYield) * 100 : 0;
+
+                return [
+                    'id' => $yield->id,
+                    'crop_name' => $yield->crop,
+                    'actual_yield' => $yield->actual_yield,
+                    'expected_min' => $expectedMinYield,
+                    'expected_max' => $expectedMaxYield,
+                    'performance' => round($performance, 2),
+                    'harvest_date' => $yield->harvest_date,
+                ];
+            })->filter(); // Remove null values
+
+        $bestCropYields = $allCropYields->sortByDesc('performance')->take(4)->values();
+
+        // latest crop yields for chart
+        $latestCropYields = $allCropYields
+            ->whereNotNull('actual_yield')
+            ->whereNotNull('harvest_date')
+            ->sortBy('harvest_date')
+            ->take(15)
+            ->values();
 
         return view('dashboard.index', [
             'plots' => $plots,
             'selectedPlot' => $selectedPlot,
             'nutrientAnalysis' => $nutrientAnalysis,
             'nutrientPredictions' => $nutrientPredictions,
-            'bestCropYields' => CropYield::where('plot_id', $selectedPlot)
-                ->orderBy('actual_yield', 'desc')->take(4)->get(),
+            'bestCropYields' => $bestCropYields,
             'mostPlantedCrops' => CropYield::where('plot_id', $selectedPlot)
                 ->select('crop', DB::raw('COUNT(*) as crop_count'))->groupBy('crop')
                 ->orderBy('crop_count', 'desc')->take(5)->get(),
             'latestSoils' => Soil::where('plot_id', $selectedPlot)
                 ->orderBy('record_date', 'desc')->take(10)->get()->sortBy('record_date'),
-            'latestCropYields' => CropYield::where('plot_id', $selectedPlot)
-                ->whereNotNull('harvest_date')
-                ->orderBy('harvest_date', 'desc')->take(10)->get()->sortBy('harvest_date'),
+            'latestCropYields' => $latestCropYields,
             'totalUsers' => User::all()->count(),
             'totalPlots' => Plot::all()->count(),
             'totalPublicPlots' => Plot::where('public', 1)->count(),

@@ -33,13 +33,13 @@
             </div>
             <!-- Top Yields -->
             <div class="w-1/2 bg-gray-50 rounded-lg shadow p-4">
-                <x-dashboard.header header="Highest Crop Yields"/>
+                <x-dashboard.header header="Best Crop Yields"/>
                 <ul>
                     @foreach($bestCropYields as $cropYield)
                         <li class="border-b border-dashed border-gray-200 last:border-b-0 last:mb-0">
-                            <a href="{{ url('crop-yield/' . $cropYield->id) }}" class="flex justify-between px-1 py-1 rounded-sm hover:bg-gray-200">
-                                <span class="text-gray-600 font-medium text-sm">{{ $cropYield->crop }}</span>
-                                <span class="text-gray-500 text-sm">{{ $cropYield->actual_yield }} Tons</span>
+                            <a href="{{ url('crop-yield/' . $cropYield['id']) }}" class="flex justify-between px-1 py-1 rounded-sm hover:bg-gray-200">
+                                <span class="text-gray-600 font-medium text-sm">{{ $cropYield['crop_name'] }}</span>
+                                <span class="text-gray-500 text-sm">{{ $cropYield['performance'] }} %</span>
                             </a>
                         </li>
                     @endforeach
@@ -173,8 +173,8 @@
 
         const cropYieldData = {
             id: @json($latestCropYields->pluck('id')),
-            crop: @json($latestCropYields->pluck('crop')),
-            cropYield: @json($latestCropYields->pluck('actual_yield')),
+            crop: @json($latestCropYields->pluck('crop_name')),
+            cropYield: @json($latestCropYields->pluck('performance')),
             recordDates: @json($latestCropYields->pluck('harvest_date')->map(fn($date) => $date->format('m-d-Y')))
         };
 

@@ -142,7 +142,7 @@ const optionsYield = {
                 return value + '<br/><b>' + date + '</b>';
             },
         },
-        y: { title: { formatter: function(value) { return '';  } } } // formats the tooltip text
+        y: { title: { formatter: function(value) { return 'Performance';  } } } // formats the tooltip text
     },
     colors: ['#8E54E9'],
     fill: {
