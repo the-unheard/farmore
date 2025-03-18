@@ -6,6 +6,7 @@ use App\Models\CityClimate;
 use App\Models\CropData;
 use App\Models\CropYield;
 use App\Models\Plot;
+use App\Services\ChartHelperService;
 use App\Services\CropRecommendationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,6 +18,9 @@ class CropYieldController extends Controller
 {
     public function index(Request $request)
     {
+
+        $chartHelperService = new chartHelperService();
+
         // Get the current logged-in user
         $user = auth()->user();
 
@@ -35,31 +39,7 @@ class CropYieldController extends Controller
         $yields = CropYield::where('plot_id', $selectedPlot)->orderBy('planting_date', 'desc')->paginate(10);
 
         // Get crop yields and calculate performance
-        $allCropYields = CropYield::where('plot_id', $selectedPlot)
-            ->orderBy('planting_date', 'desc')
-            ->get()
-            ->map(function ($yield) use ($selectedPlot) {
-                $cropData = CropData::where('crop_name', $yield->crop)->first();
-
-                if (!$cropData) {
-                    return null; // Skip if crop data is missing
-                }
-
-                $expectedMinYield = $cropData->yield_min * Plot::where('id', $selectedPlot)->value('hectare');
-                $expectedMaxYield = $cropData->yield_max * Plot::where('id', $selectedPlot)->value('hectare');
-
-                $performance = $expectedMaxYield > 0 ? ($yield->actual_yield / $expectedMaxYield) * 100 : 0;
-
-                return [
-                    'id' => $yield->id,
-                    'crop_name' => $yield->crop,
-                    'actual_yield' => $yield->actual_yield,
-                    'expected_min' => $expectedMinYield,
-                    'expected_max' => $expectedMaxYield,
-                    'performance' => round($performance, 2),
-                    'harvest_date' => $yield->harvest_date,
-                ];
-            })->filter(); // Remove null values
+        $allCropYields = $chartHelperService->getCropYieldsWithPerformance($selectedPlot);
 
         // best performing crops for small table
         $bestCropYields = $allCropYields->sortByDesc('performance')->take(8)->values();
@@ -111,9 +91,7 @@ class CropYieldController extends Controller
             'plots' => $plots,
             'selectedPlot' => $selectedPlot,
             'latestCropYields' => $latestCropYields,
-            'mostPlantedCrops' => CropYield::where('plot_id', $selectedPlot)
-                ->select('crop', DB::raw('COUNT(*) as crop_count'))->groupBy('crop')
-                ->orderBy('crop_count', 'desc')->take(5)->get(),
+            'mostPlantedCrops' => $chartHelperService->mostPlantedCrops($selectedPlot),
             'bestCropYields' => $bestCropYields,
             'bestRotationPairs' => $bestRotationPairs,
         ]);

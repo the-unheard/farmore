@@ -62,3 +62,46 @@
 .pulse {
     animation: pulse 1s ease-out;
 }
+
+
+/* Ensure the legend series are flex containers */
+#most-planted-chart .apexcharts-legend-series {
+    display: flex;
+    width: 100%;
+    padding: 3px 0;
+}
+
+/* Make the text span the full width of the parent */
+#most-planted-chart .apexcharts-legend-text {
+    width: 100%;
+    display: flex;
+}
+
+/* Crop name on the left */
+#most-planted-chart .most-planted-crop,
+#most-planted-chart .most-planted-count,
+#most-planted-chart .most-planted-percentage {
+    flex: 1;
+    font-size: 14px;
+    color: #374151;
+    font-weight: 400;
+}
+
+#most-planted-chart .most-planted-count {
+    margin-right: 10px;
+}
+
+#most-planted-chart .most-planted-percentage {
+    margin-right: -40px;
+}
+
+#most-planted-chart .apexcharts-tooltip {
+    background: rgb(31 41 55);
+    padding-top: 4px;
+}
+
+#most-planted-chart .apexcharts-legend-marker {
+    display: none;
+}
+
+

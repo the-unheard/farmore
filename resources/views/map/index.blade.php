@@ -23,7 +23,7 @@
                     <h4 class="font-semibold text-gray-900">Crop Filter</h4>
                 </div>
                 <!-- Scrollable Crop List -->
-                <div id="map-index-crop-filter" class="grid grid-cols-1 mt-1 max-h-96 overflow-y-auto">
+                <div id="map-index-crop-filter" class="grid grid-cols-1 mt-1 overflow-y-auto">
                     <label class="flex items-center hover:bg-gray-200 py-[3px] px-2 m-0 cursor-pointer">
                         <input type="checkbox" id="toggle-all" class="rounded-sm checkbox-grad-blue" checked>
                         <span class="ml-2 text-gray-700 text-sm">Select/Deselect All</span>

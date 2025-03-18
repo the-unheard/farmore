@@ -53,3 +53,7 @@
 #map-index-crop-filter {
     scrollbar-width: thin;
 }
+
+#map-index-crop-filter {
+    height: 700px;
+}

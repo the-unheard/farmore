@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\CropData;
 use App\Models\Plot;
+use App\Services\RecommendationService;
 use Carbon\Carbon;
 use App\Services\CropRecommendationService;
+use App\Services\ChartHelperService;
 use Illuminate\Http\Request;
 
 class MapController extends Controller
@@ -57,6 +59,8 @@ class MapController extends Controller
 
     public function show(Plot $plot)
     {
+        $chartHelperService = new chartHelperService();
+
         // Ensure the plot is public (public = 1)
         if ($plot->public !== 1) {
             abort(404); // If the plot is not public, return a 404 page
@@ -86,26 +90,11 @@ class MapController extends Controller
                 'record_date' => 'Not available'
             ];
 
-        // Fetch the latest crop yield record
-        $latestYield = $plot->latestYield;
-
         // Fetch all crop yield records for this plot
-        $allYields = $plot->cropyield()->orderBy('harvest_date', 'desc')->get()->map(function ($yield) use ($plot) {
-            $cropData = CropData::where('crop_name', $yield->crop)->first();
-            $hectare = $plot->hectare;
+        $allYields = $chartHelperService->getCropYieldsWithPerformance($plot->id);
 
-            // Calculate expected yield and performance
-            $expectedMaxYield = $cropData ? $cropData->yield_max * $hectare : null;
-            $performance = $expectedMaxYield > 0 ? ($yield->actual_yield / $expectedMaxYield) * 100 : null;
-
-            return [
-                'crop_name' => $yield->crop,
-                'actual_yield' => $yield->actual_yield ?? 'Not available',
-                'planting_date' => $yield->planting_date->format('Y-m-d'),
-                'harvest_date' => $yield->harvest_date ? $yield->harvest_date->format('Y-m-d') : 'Not available',
-                'performance' => $performance ? round($performance, 2) . '%' : 'Not available'
-            ];
-        });
+        // For bar graph
+        $bestCropYields = $allYields->sortByDesc('performance')->take(8)->values();
 
         // Convert to Laravel collection and paginate manually
         $paginatedYields = \Illuminate\Pagination\Paginator::resolveCurrentPage('page');
@@ -126,6 +115,8 @@ class MapController extends Controller
             'crop_yields' => $pagedData, // <-- Now a paginated collection
             'apiKey' => config('services.mapbox.key'),
             'latest_soil' => $soilData,
+            'mostPlantedCrops' => $chartHelperService->mostPlantedCrops($plot->id),
+            'bestCropYields' => $bestCropYields,
         ]);
     }
 

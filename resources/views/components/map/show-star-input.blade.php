@@ -1,6 +1,6 @@
 @props(['action', 'plot'])
 
-<div class="w-1/2 bg-gray-100 text-gray-500 p-4 rounded-lg flex justify-between items-center shadow-sm">
+<div class="w-1/2 bg-gray-50 text-gray-500 p-4 rounded-lg flex justify-between items-center shadow-sm">
     <div>
         <label class="block text-sm font-medium">Give Rating</label>
         @authNotId($plot->user_id)
