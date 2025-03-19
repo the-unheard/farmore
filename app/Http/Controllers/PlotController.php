@@ -19,7 +19,9 @@ class PlotController extends Controller
 
     public function create()
     {
-        return view('plot.create');
+        return view('plot.create', [
+            'apiKey' => config('services.mapbox.key')
+        ]);
     }
 
     public function store()

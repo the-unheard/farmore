@@ -2,7 +2,7 @@
     <x-slot:title>Plot Management - Create</x-slot:title>
 
     <script>
-        const mapboxToken = @json(env('MAPBOX_TOKEN'));
+        const mapboxToken = @json($apiKey);
     </script>
 
     <form method="POST" action="/plot" class="max-w-6xl mx-auto">
