@@ -49,7 +49,7 @@ class MapController extends Controller
             return response()->json(['plots' => $plots]);
         }
 
-        // returns all public plots with soil data to the view
+        // returns all public plots with crop data to the view
         return view('map.index', [
             'pins' => $plots,
             'crops' => $cropNames,

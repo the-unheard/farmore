@@ -64,9 +64,20 @@ class PlotController extends Controller
     {
         $this->authorizeOwner($plot);
         $validatedData = $this->validateInput();
+
+        try {
+            // Recalculate city and climate using new latitude & longitude
+            $cityData = $this->getCityClimate($validatedData['latitude'], $validatedData['longitude']);
+            $validatedData['city'] = $cityData['city'];
+            $validatedData['climate'] = $cityData['climate'];
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
         $plot->update($validatedData);
-        return redirect('/plot/' . $plot->id);
+        return redirect('/plot/' . $plot->id)->with('success', 'Plot updated successfully!');
     }
+
 
     public function destroy(Plot $plot)
     {
