@@ -10,65 +10,52 @@ export function populateEstimates(cropName, plotId) {
     const plantPhSpan = document.getElementById('yield-predict-ph');
     const plantMaturitySpan = document.getElementById('yield-predict-maturity');
     const plantProduceSpan = document.getElementById('yield-predict-produce');
+    const plantOthersHarvested = document.getElementById('yield-others-harvested');
+    const plantTotalExpected = document.getElementById('yield-total-expected');
+    const plantIdealFertilizer = document.getElementById('yield-ideal-fertilizer');
+    const plantIdealPh = document.getElementById('yield-ideal-ph');
 
     fetch(`/crop-yield-estimates?crop_name=${cropName}&plot_id=${plotId}`)
         .then(response => response.json())
         .then(data => {
+            // Use Laravel-calculated values
             const {
-                ideal_soil, ideal_month, seeds_min, seeds_max, seeds_unit,
-                density_min, density_max, spacing_plant_min, spacing_plant_max,
-                spacing_row_min, spacing_row_max, fertilizer_advice, ph_advice,
-                maturity_min, maturity_max, maturity_unit, maturity_type,
-                produce_min, produce_max, hectare
+                crop_name, ideal_soil, ideal_soonest_month, seeds_needed,
+                density, spacing_plant, spacing_row, ph, npk, maturity, yield_message,
+                total_actual_yield, total_expected, my_expected_max, ph_fertilizer, npk_fertilizer
             } = data;
 
             // Title
-            plantTitle.innerText = `Recommendations for ${cropName}`;
+            plantTitle.innerText = `Recommendations for ${crop_name}`;
 
-            // Soil type and month
-            plantSoilTypeSpan.innerText = `${ideal_soil}`;
-            plantMonthSpan.innerText = `It's ideal to plant ${ideal_month}`;
+            // Soil type and planting time
+            plantSoilTypeSpan.innerText = ideal_soil;
+            plantMonthSpan.innerText = `It's ideal to plant in ${ideal_soonest_month}`;
 
-            // Seed calculation
-            const seedsMin = (seeds_min * hectare).toLocaleString();
-            const seedsMax = (seeds_max * hectare).toLocaleString();
-            plantSeedSpan.innerText = seedsMin === seedsMax ?
-                `Around ${seedsMin} ${seeds_unit}` : `${seedsMin} to ${seedsMax} ${seeds_unit}`;
-
-            // Density calculation
-            const densityMin = Math.floor((density_min * hectare)).toLocaleString();
-            const densityMax = Math.floor((density_max * hectare)).toLocaleString();
-            plantDensitySpan.innerText = densityMin === densityMax ?
-                `Around ${densityMin} plants` : `${densityMin} to ${densityMax} plants`;
+            // Seeds & density (already calculated in Laravel)
+            plantSeedSpan.innerText = seeds_needed;
+            plantDensitySpan.innerText = density;
 
             // Spacing
-            plantSpacingSpan.innerText = spacing_plant_min === spacing_plant_max ?
-                `Around ${spacing_plant_min} cm` : `${spacing_plant_min}-${spacing_plant_max} cm`;
-
-            if (spacing_row_min && spacing_row_max) {
-                plantRowSpacingSpan.innerText = spacing_row_min === spacing_row_max ?
-                    `Around ${spacing_row_min} cm` : `${spacing_row_min}-${spacing_row_max} cm`;
-            } else {
-                plantRowSpacingSpan.innerText = 'Row spacing not available';
-            }
+            plantSpacingSpan.innerText = spacing_plant;
+            plantRowSpacingSpan.innerText = spacing_row ? spacing_row : 'Row spacing not available';
 
             // Fertilizer advice
-            plantFertilizerSpan.innerText = fertilizer_advice;
-            plantPhSpan.innerText = ph_advice;
+            plantFertilizerSpan.innerText = npk;
+            plantPhSpan.innerText = ph;
+            plantIdealFertilizer.innerText = npk_fertilizer;
+            plantIdealPh.innerText = ph_fertilizer;
 
-            // Maturity
-            const maturityMin = Math.floor((maturity_min * hectare)).toLocaleString();
-            const maturityMax = Math.floor((maturity_max * hectare)).toLocaleString();
-            plantMaturitySpan.innerText = maturityMin === maturityMax ?
-                `Around ${maturityMin} ${maturity_unit} after ${maturity_type}` : `${maturityMin} to ${maturityMax} ${maturity_unit} after ${maturity_type}`;
+            // Maturity & Expected Yield
+            plantMaturitySpan.innerText = maturity;
+            plantProduceSpan.innerText = `Expected yield: ${yield_message}`;
 
-            // Produce
-            const produceMin = Math.floor((produce_min * hectare)).toLocaleString();
-            const produceMax = Math.floor((produce_max * hectare)).toLocaleString();
-            const produceAvg = ((produce_min * hectare) + (produce_max * hectare)) / 2;
-            plantProduceSpan.innerText = produceMin === produceMax ?
-                `Around ${produceMin} tons` : `${produceMin} to ${produceMax} tons`;
+            // Other farms' harvested total
+            plantOthersHarvested.innerText = `${total_actual_yield} tons`;
+            plantTotalExpected.innerText = total_expected;
 
         })
         .catch(error => console.error('Error:', error));
+
+
 }

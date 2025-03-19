@@ -20,24 +20,31 @@
                     <x-form-date-picker input_id="harvest_date" placeholder="" comment="(Optional)" :value="$yield">Harvest Date</x-form-date-picker>
                 </div>
 
-                <div class="w-2/3 h-[450px] mt-10 bg-gray-50 rounded-lg shadow p-6">
+                <div class="w-full h-[450px] mt-10 bg-gray-50 rounded-lg shadow p-6">
                     <h2 id="yield-predict-title" class="text-lg font-semibold text-gray-800 mb-4">Recommendations</h2>
                     <div class="flex">
-                        <div class="w-1/2 relative py-4">
+                        <div class="w-1/3 relative py-2">
                             <div class="absolute w-0.5 bg-gray-300 h-72 left-4 top-10"></div>
                             <x-crop-yield-timeline-item id="yield-predict-soil-type" label="Is my soil type ideal?" icon="fa-mound" color="text-yellow-900"/>
                             <x-crop-yield-timeline-item id="yield-predict-month" label="When should planting start?" icon="fa-wind" color="text-sky-500"/>
                             <x-crop-yield-timeline-item id="yield-predict-seed" label="How many seeds are needed?" icon="fa-cubes-stacked" color="text-lime-500"/>
                             <x-crop-yield-timeline-item id="yield-predict-density" label="How many plants to grow?" icon="fa-seedling" color="text-green-500"/>
-                            <x-crop-yield-timeline-item id="yield-predict-plant-spacing" label="What's the ideal plant spacing?" icon="fa-braille" color="text-stone-500"/>
-                        </div>
-                        <div class="w-1/2 relative py-4">
-                            <div class="absolute w-0.5 bg-gray-300 h-72 left-4 top-10"></div>
-                            <x-crop-yield-timeline-item id="yield-predict-row-spacing" label="What's the ideal row spacing?" icon="fa-braille" color="text-stone-500"/>
-                            <x-crop-yield-timeline-item id="yield-predict-fertilizer" label="How should fertilization be done?" icon="fa-spray-can-sparkles" color="text-teal-500"/>
-                            <x-crop-yield-timeline-item id="yield-predict-ph" label="How should pH be adjusted?" icon="fa-spray-can-sparkles" color="text-teal-500"/>
-                            <x-crop-yield-timeline-item id="yield-predict-maturity" label="How long until harvest?" icon="fa-carrot" color="text-amber-500"/>
                             <x-crop-yield-timeline-item id="yield-predict-produce" label="What is the expected yield?" icon="fa-dolly" color="text-zinc-500"/>
+                        </div>
+                        <div class="w-1/3 relative py-2">
+                            <div class="absolute w-0.5 bg-gray-300 h-48 left-4 top-10"></div>
+                            <x-crop-yield-timeline-item id="yield-predict-plant-spacing" label="What's the ideal plant spacing?" icon="fa-braille" color="text-stone-500"/>
+                            <x-crop-yield-timeline-item id="yield-predict-row-spacing" label="What's the ideal row spacing?" icon="fa-braille" color="text-stone-500"/>
+                            <x-crop-yield-timeline-item id="yield-others-harvested" label="How much have other farms harvested recently?" icon="fa-dolly" color="text-green-500"/>
+                            <x-crop-yield-timeline-item id="yield-total-expected" label="How much are other farms expecting to harvest soon?" icon="fa-dolly" color="text-amber-500"/>
+                        </div>
+                        <div class="w-1/3 relative py-2">
+                            <div class="absolute w-0.5 bg-gray-300 h-72 left-4 top-10"></div>
+                            <x-crop-yield-timeline-item id="yield-predict-fertilizer" label="How should fertilization be done?" icon="fa-spray-can-sparkles" color="text-teal-500"/>
+                            <x-crop-yield-timeline-item id="yield-ideal-fertilizer" label="Which NPK fertilizer is ideal?" icon="fa-spray-can-sparkles" color="text-teal-500"/>
+                            <x-crop-yield-timeline-item id="yield-predict-ph" label="How should pH be adjusted?" icon="fa-spray-can-sparkles" color="text-teal-500"/>
+                            <x-crop-yield-timeline-item id="yield-ideal-ph" label="Which pH fertilizer is ideal?" icon="fa-spray-can-sparkles" color="text-teal-500"/>
+                            <x-crop-yield-timeline-item id="yield-predict-maturity" label="How long until harvest?" icon="fa-carrot" color="text-amber-500"/>
                         </div>
                     </div>
                 </div>

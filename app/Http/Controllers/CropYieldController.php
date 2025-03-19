@@ -8,6 +8,7 @@ use App\Models\CropYield;
 use App\Models\Plot;
 use App\Services\ChartHelperService;
 use App\Services\CropRecommendationService;
+use App\Services\RecommendationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -194,139 +195,13 @@ class CropYieldController extends Controller
             'plot_id' => ['required', 'integer'],
         ]);
 
-        $crop = CropData::where('crop_name', $request->crop_name)->firstOrFail();
         $plot = auth()->user()->plot()->findOrFail($request->plot_id);
-        $idealSoil = $this->getIdealSoil($plot, $crop);
-        $idealMonth = $this->getIdealMonth($plot, $crop);
-        $fertilizerAdvice = $this->getNPK($plot, $crop);
-        $phAdvice = $this->getPH($plot, $crop);
+        $recommendationService = new RecommendationService();
+        $cropInformation = $recommendationService->getCropInformation($request->crop_name, $plot);
 
-        return response()->json([
-            'ideal_soil' => $idealSoil,
-            'ideal_month' => $idealMonth,
-            'seeds_min' => $crop->seeds_needed_min,
-            'seeds_max' => $crop->seeds_needed_max,
-            'seeds_unit' => $crop->seeds_unit,
-            'density_min' => $crop->density_min,
-            'density_max' => $crop->density_max,
-            'spacing_plant_min' => $crop->spacing_plant_min,
-            'spacing_plant_max' => $crop->spacing_plant_max,
-            'spacing_row_min' => $crop->spacing_row_min,
-            'spacing_row_max' => $crop->spacing_row_max,
-            'fertilizer_advice' => $fertilizerAdvice,
-            'ph_advice' => $phAdvice,
-            'maturity_min' => $crop->maturity_min,
-            'maturity_max' => $crop->maturity_max,
-            'maturity_unit' => $crop->maturity_unit,
-            'maturity_type' => $crop->maturity_type,
-            'produce_min' => $crop->yield_min,
-            'produce_max' => $crop->yield_max,
-            'hectare' => $plot->hectare,
-        ]);
-    }
-
-    private function getIdealSoil($plot, $crop)
-    {
-        $plotSoilType = $plot->soil_type;
-
-        $idealSoilType = json_decode($crop->soil_types, true);
-
-        if(in_array($plotSoilType, $idealSoilType)){
-            return 'Yes, it\'s ideal on your ' . $plotSoilType . ' soil';
-        } else {
-            if (count($idealSoilType) > 1) {
-                $last = array_pop($idealSoilType);
-                $formattedSoilTypes = implode(', ', $idealSoilType) . ' and ' . $last;
-            } else {
-                $formattedSoilTypes = $idealSoilType[0];
-            }
-
-            return 'No, it\'s better on ' . $formattedSoilTypes;
-        }
-    }
-
-    private function getIdealMonth($plot, $crop)
-    {
-        $city = $plot->city;
-        $climate = CityClimate::where('municipality', $city)->firstOrFail()->climate;
-        $climateColumn = 'climate_' . $climate;
-        $allowedMonths = json_decode($crop->$climateColumn, true);
-
-        sort($allowedMonths);
-        $currentMonth = now()->month;
-        $idealMonth = null;
-        foreach ($allowedMonths as $month) {
-            if($month === $currentMonth) {
-                return 'this month';
-            }
-            else if ($month > $currentMonth) {
-                $idealMonth = $month;
-                break;
-            }
-        }
-        if (!$idealMonth) {
-            $idealMonth = $allowedMonths[0];
-        }
-        return 'on ' . Carbon::createFromFormat('m', $idealMonth)->format('F');
-    }
-
-    private function getNPK($plot, $crop)
-    {
-        $cropRecommendationService = new CropRecommendationService();
-
-        // get the latest soil record for the plot
-        $soil = $plot->latestSoil;
-
-        if (!$soil) {
-            return 'No soil record found';
-        }
-
-        $normalizedNPK = $cropRecommendationService->normalizedNPK($crop, $soil);
-
-        $prioritize = [];
-
-        if ($normalizedNPK['normalizedUserN'] < $normalizedNPK['normalizedCropN']) {
-            $prioritize[] = 'Nitrogen';
-        }
-        if ($normalizedNPK['normalizedUserP'] < $normalizedNPK['normalizedCropP']) {
-            $prioritize[] = 'Phosphorus';
-        }
-        if ($normalizedNPK['normalizedUserK'] < $normalizedNPK['normalizedCropK']) {
-            $prioritize[] = 'Potassium';
-        }
-
-        if (!empty($prioritize)) {
-            return 'Focus more on ' . implode(' and ', $prioritize);
-        } else {
-            return 'Give a balanced amount of NPK';
-        }
+        return response()->json($cropInformation, 200);
 
     }
 
-    private function getPH($plot, $crop) {
-
-        $soil = $plot->latestSoil;
-        if (!$soil) {
-            return 'No soil record found';
-        }
-
-        $userPh = $soil->ph;
-        $cropPhMin = $crop->req_ph_min;
-        $cropPhMax = $crop->req_ph_max;
-
-        if (!$userPh) {
-            return 'No recent pH record';
-        } elseif ($userPh) {
-            if ($userPh > $cropPhMax) {
-                return 'pH must be decreased to ' . $cropPhMin . ' - ' . $cropPhMax . ' pH';
-            } elseif ($userPh < $cropPhMin) {
-                return 'pH must be increased to ' . $cropPhMin . ' - ' . $cropPhMax . ' pH';
-            } else {
-                return 'pH is currently ideal';
-            }
-        } else {
-            return 'No record';
-        }
-    }
 
 }

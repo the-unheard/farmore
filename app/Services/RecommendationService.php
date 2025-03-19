@@ -240,6 +240,11 @@ class RecommendationService
             return ['message' => 'Not enough soil health data', 'prioritize' => []];
         }
 
+        // ideal npk mg/kg
+        $highNitrogen = 50;
+        $highPhosphorus = 35;
+        $highPotassium = 160;
+
         // user's soil nutrients
         $userN = $latestSoil->nitrogen;
         $userP = $latestSoil->phosphorus;
@@ -264,13 +269,13 @@ class RecommendationService
 
         $prioritize = [];
 
-        if ($normalizedUserN < $normalizedCropN) {
+        if ($normalizedUserN < $normalizedCropN && $userN <= $highNitrogen) {
             $prioritize[] = 'nitrogen';
         }
-        if ($normalizedUserP < $normalizedCropP) {
+        if ($normalizedUserP < $normalizedCropP && $userP <= $highPhosphorus) {
             $prioritize[] = 'phosphorus';
         }
-        if ($normalizedUserK < $normalizedCropK) {
+        if ($normalizedUserK < $normalizedCropK && $userK <= $highPotassium) {
             $prioritize[] = 'potassium';
         }
 
@@ -318,9 +323,8 @@ class RecommendationService
 
     }
 
-
-
     public function getCropInformation($crop_name, $selectedPlot, $recommendedBySoilHealth = false) {
+
         // plot information
         $plotSize = $selectedPlot->hectare;
         $soilType = $selectedPlot->soil_type;
@@ -379,7 +383,7 @@ class RecommendationService
             'ideal_soil' => $this->checkIdealSoil($cropData, $soilType),
             'seeds_needed' => $this->calculateSeeds($cropData, $plotSize),
             'density' => $this->calculateDensity($cropData, $plotSize),
-            'yield' => $this->calculateYield($cropData, $plotSize),
+            'yield_message' => $this->calculateYield($cropData, $plotSize),
             'maturity' => $this->calculateMaturity($cropData),
             'spacing_plant' => $this->calculateSpacingPlant($cropData),
             'spacing_row' => $this->calculateSpacingRow($cropData),
@@ -398,5 +402,7 @@ class RecommendationService
             'npk_fertilizer' => $npkFertilizer,
         ];
     }
+
+
 
 }
