@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Log;
+
 
 class User extends Authenticatable
 {
@@ -59,14 +61,40 @@ class User extends Authenticatable
         parent::boot();
 
         static::deleting(function ($user) {
-            // delete all plots first
-            $user->plots()->each(function ($plot) {
-                $plot->rating()->delete();
-                $plot->cropyield()->delete();
-                $plot->soil()->delete();
-                $plot->delete();
+
+            // delete all plots (ratings it received, its crop yield record, soil record, then the plot itself)
+            $user->plot()->each(function ($plot) {
+                try {
+                    $plot->rating()->delete();
+                    Log::info("Deleted rating for plot ID {$plot->id}");
+                } catch (\Exception $e) {
+                    Log::error("Failed to delete rating for plot ID {$plot->id}: " . $e->getMessage());
+                }
+
+                try {
+                    $plot->cropyield()->delete();
+                    Log::info("Deleted crop yield for plot ID {$plot->id}");
+                } catch (\Exception $e) {
+                    Log::error("Failed to delete crop yield for plot ID {$plot->id}: " . $e->getMessage());
+                }
+
+                try {
+                    $plot->soil()->delete();
+                    Log::info("Deleted soil record for plot ID {$plot->id}");
+                } catch (\Exception $e) {
+                    Log::error("Failed to delete soil record for plot ID {$plot->id}: " . $e->getMessage());
+                }
+
+                try {
+                    $plot->delete();
+                    Log::info("Deleted plot ID {$plot->id}");
+                } catch (\Exception $e) {
+                    Log::error("Failed to delete plot ID {$plot->id}: " . $e->getMessage());
+                }
             });
 
+
+            // delete ratings given by this user
             $user->rating()->delete();
         });
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Carbon\Carbon;
 
 class ManageUserController extends Controller
 {
@@ -12,16 +13,6 @@ class ManageUserController extends Controller
         return view('manage-users.index', [
             'users' => User::select('id', 'username', 'email', 'created_at')->with('roles:id,name')->orderBy('id', 'asc')->paginate(10)
         ]);
-    }
-
-    public function create()
-    {
-
-    }
-
-    public function store()
-    {
-
     }
 
     public function show($id)
@@ -36,19 +27,52 @@ class ManageUserController extends Controller
     }
 
 
-    public function edit(User $user)
+    public function edit($id)
     {
+        $user = User::findOrFail($id);
 
+
+        return view('manage-users.edit', [
+            'user' => $user,
+        ]);
     }
 
-    public function update(User $user)
+    public function update($id)
     {
+        $validatedData = $this->validateInput();
 
+        $user = User::findOrFail($id);
+        $user->update($validatedData);
+
+        return redirect('/manage-users/' . $id)->with('success', 'User record updated successfully.');
     }
 
-    public function destroy(User $user)
+    public function destroy($id)
     {
 
+        $user = User::findOrFail($id);
+
+        if ($user->id === 1) {
+            return redirect('/manage-users')->with('Error', 'You don\'t have permission to delete this.');
+        }
+
+        $user->delete();
+        return redirect('/manage-users')->with('success', 'User deleted successfully.');
+    }
+
+    private function validateInput(): array
+    {
+        $validatedData = request()->validate([
+            'username' => [
+                'required',
+                'regex:/^[a-zA-Z0-9._-]+$/', // Allows letters, numbers, dots, dashes, and underscores
+                'min:1',
+                'max:20',
+                'unique:users,username,' . request()->route('user')
+            ],
+        ]);
+
+        return $validatedData;
     }
 
 }

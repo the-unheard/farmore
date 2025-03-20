@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>Soil Health Tracking - Create</x-slot:title>
+    <x-slot:title>Soil Health Tracking - Edit</x-slot:title>
     <x-slot:heading></x-slot:heading>
     <form method="POST" action="/soil/{{ $soil->id }}" class="max-w-6xl mx-auto">
         @csrf

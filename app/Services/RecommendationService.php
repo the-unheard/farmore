@@ -221,8 +221,6 @@ class RecommendationService
         }
     }
 
-
-
     private function calculateNPK($cropData, $selectedPlot) {
         $latestSoil = $selectedPlot->latestSoil;
 

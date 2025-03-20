@@ -19,15 +19,17 @@
             </div>
         </div>
 
+        @if ($user->id !== 1)
         <div class="w-full flex justify-end mt-6">
             <div class="flex items-center space-x-2">
-                <form method="POST" action="/manage-users/{{ $user->id }}">
+                <form method="POST" action="/manage-users/{{ $user->id }}"  onsubmit="return confirm('Are you sure you want to delete this user?');">
                     @csrf
                     @method('DELETE')
-                    <x-form-delete-button>Delete</x-form-delete-button>
+                    <x-form-delete-button>Delete User</x-form-delete-button>
                 </form>
-                <x-common-anchor href="/manage-users/{{ $user->id }}/edit">Edit</x-common-anchor>
+                <x-common-anchor href="/manage-users/{{ $user->id }}/edit">Change Username</x-common-anchor>
             </div>
         </div>
+        @endif
     </div>
 </x-layout>

@@ -1,6 +1,10 @@
 <x-layout>
     <x-slot:title>Manage Users</x-slot:title>
 
+    <h5 class="font-bold text-4xl text-gray-700 my-8">
+        <i class="fas fa-user-gear"></i>
+        Manage Users
+    </h5>
     <!-- Table -->
     <div class="relative overflow-x-auto sm:rounded-lg">
         <table class="w-full text-sm text-left rtl:text-right text-gray-500">
