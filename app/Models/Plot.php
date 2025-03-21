@@ -23,7 +23,7 @@ class Plot extends Model
 
     public function latestSoil()
     {
-        return $this->hasOne(Soil::class)->latestOfMany();
+        return $this->hasOne(Soil::class)->latestOfMany('record_date');
     }
 
     public function latestYield()
