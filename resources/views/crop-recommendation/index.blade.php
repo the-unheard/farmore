@@ -4,7 +4,7 @@
 
     <!-- City and Climate -->
     <div>
-        <span class="text-gray-500 text-sm">{{ $city }}, Climate Type {{ $climate }}</span>
+        <span class="text-gray-500 text-sm">{{ $city }}, Climate Type {{ $climate }}, {{ $soilType }}</span>
     </div>
 
     <div class="mt-4 bg-gray-50 rounded-lg shadow p-3 mb-4">

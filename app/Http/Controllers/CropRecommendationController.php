@@ -6,6 +6,7 @@ use App\Models\CityClimate;
 use App\Models\Plot;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CropRecommendationController extends Controller
 {
@@ -29,6 +30,7 @@ class CropRecommendationController extends Controller
         $selectedPlot = Plot::where('user_id', $user->id)->findOrFail($selectedPlotId);
         $city = $selectedPlot->city;
         $climate = CityClimate::where('municipality', $city)->firstOrFail()->climate;
+        $soilType = Str::title($selectedPlot->soil_type);
 
         // Get latitude & longitude of the selected plot for weather API
         $latitude = $selectedPlot->latitude;
@@ -67,6 +69,7 @@ class CropRecommendationController extends Controller
             'longitude' => $longitude,
             'city' => $city,
             'climate' => $climate,
+            'soilType' => $soilType,
         ]);
     }
 

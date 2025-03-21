@@ -7,6 +7,7 @@ use App\Models\CropData;
 use App\Models\CropRecommendation;
 use App\Models\CropYield;
 use App\Models\Plot;
+use Illuminate\Support\Str;
 use Phpml\Classification\NaiveBayes;
 
 class RecommendationService
@@ -94,12 +95,14 @@ class RecommendationService
 
     private function checkIdealSoil($cropData, $soilType) {
 
+        $soilType = strtolower($soilType);
+
         // decode the soil_types JSON array from the CropData
         $idealSoilTypes = json_decode($cropData->soil_types, true);
 
         // check if the plot's soil type is in the list of ideal soil types
         if (in_array($soilType, $idealSoilTypes)) {
-            return "Yes";
+            return "Yes, it is ideal on $soilType";
         }
 
         // format the ideal soil types as a readable sentence
@@ -344,7 +347,7 @@ class RecommendationService
         $npkRecommendation = $this->calculateNPK($cropData, $selectedPlot);
 
         if ($phRecommendation['message'] === 'pH is currently ideal') $reasons[] = 'ph level';
-        if ($this->checkIdealSoil($cropData, $soilType) === "Yes") $reasons[] = 'soil type';
+        if (Str::startsWith($this->checkIdealSoil($cropData, $soilType), 'Yes')) $reasons[] = 'soil type';
 
         // Get fertilizer recommendations
         $phFertilizer = $this->getFertilizer([$phRecommendation['tag']], $plotSize);
