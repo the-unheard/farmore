@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CityClimate;
 use App\Models\Plot;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
@@ -26,6 +27,8 @@ class CropRecommendationController extends Controller
         // checks for request parameter (/index?plot_id={id}), then fallback is first plot in database
         $selectedPlotId = $request->input('plot_id', $plots->first()->id);
         $selectedPlot = Plot::where('user_id', $user->id)->findOrFail($selectedPlotId);
+        $city = $selectedPlot->city;
+        $climate = CityClimate::where('municipality', $city)->firstOrFail()->climate;
 
         // Get latitude & longitude of the selected plot for weather API
         $latitude = $selectedPlot->latitude;
@@ -62,6 +65,8 @@ class CropRecommendationController extends Controller
             'plotHectare' => $selectedPlot->hectare,
             'latitude' => $latitude,
             'longitude' => $longitude,
+            'city' => $city,
+            'climate' => $climate,
         ]);
     }
 

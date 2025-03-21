@@ -2,6 +2,11 @@
     <x-slot:title>Crop Recommendation</x-slot:title>
     <x-index-plot-dropdown :model="$plots" :selected="$selectedPlotId" action="/crop-recommendation"/>
 
+    <!-- City and Climate -->
+    <div>
+        <span class="text-gray-500 text-sm">{{ $city }}, Climate Type {{ $climate }}</span>
+    </div>
+
     <div class="mt-4 bg-gray-50 rounded-lg shadow p-3 mb-4">
         @if(!empty($finalRecommendations) && is_array($finalRecommendations))
             <!-- Tab Buttons -->
