@@ -44,6 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const cropGrid10mButton = document.getElementById("cropGrid10m");
         const cropGrid1mButton = document.getElementById("cropGrid1m");
 
+        console.log('Applying restriction');
+
         // Disable cropGrid10m button if plantMin and rowMin are both less than 15
         if (plantMin < 15 && rowMin < 15) {
             cropGrid10mButton.disabled = true;
