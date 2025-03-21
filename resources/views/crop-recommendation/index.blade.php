@@ -92,8 +92,8 @@
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm py-2">Crop Spacing Area</label>
                     <div class="flex rounded-lg bg-gray-200 p-2">
-                        <button id="cropGrid10m" class="w-1/3 text-sm font-semibold px-4 py-1 rounded bg-white shadow text-gray-800 hover:text-gray-800">10m<sup>2</sup></button>
-                        <button id="cropGrid1m" class="w-1/3 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">1m<sup>2</sup></button>
+                        <button id="cropGrid10m" class="w-1/3 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">10m<sup>2</sup></button>
+                        <button id="cropGrid1m" class="w-1/3 text-sm font-semibold px-4 py-1 rounded bg-white shadow text-gray-800 hover:text-gray-800">1m<sup>2</sup></button>
                         <button id="cropGrid0_1m" class="w-1/3 text-sm font-semibold px-4 py-1 text-gray-600 hover:text-gray-800">0.1m<sup>2</sup></button>
                     </div>
                 </div>

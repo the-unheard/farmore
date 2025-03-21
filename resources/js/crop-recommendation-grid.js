@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let parsedCoordinates = typeof plotCoordinates === "string" ? JSON.parse(plotCoordinates) : plotCoordinates;
     let canvasSize = 650;
     let gridSizeMeters = 10; // Default plot grid size (10m)
-    let cropGridSizeMeters = 1000; // Default crop grid size (1m = 100cm)
+    let cropGridSizeMeters = 100; // Default crop grid size in cm (1m = 100cm)
     let activeCropIndex = 0; // Default first crop
 
     const polygonCoordinates = parsedCoordinates.map(coord => Array.isArray(coord) ? coord : Object.values(coord));
@@ -40,6 +40,26 @@ document.addEventListener("DOMContentLoaded", function () {
         rowSpacingValue.textContent = hasRowSpacing ? `${rowMin} cm` : "";
 
         document.getElementById("spacingRowSlider").style.display = hasRowSpacing ? "block" : "none";
+
+        const cropGrid10mButton = document.getElementById("cropGrid10m");
+        const cropGrid1mButton = document.getElementById("cropGrid1m");
+
+        // Disable cropGrid10m button if plantMin and rowMin are both less than 15
+        if (plantMin < 15 && rowMin < 15) {
+            cropGrid10mButton.disabled = true;
+            cropGrid10mButton.classList.add("opacity-50", "cursor-not-allowed");
+        } else {
+            cropGrid10mButton.disabled = false;
+            cropGrid10mButton.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+
+        // Auto-switch to 1m² if 10m² is currently selected but now invalid
+        if (plantMin < 15 && rowMin < 15 && cropGrid10mButton.classList.contains("bg-white")) {
+            // Auto-switch to 1m²
+            cropGridSizeMeters = 100; // 1m = 100cm
+            setActiveButton([cropGrid10mButton, cropGrid1mButton, document.getElementById("cropGrid0_1m")], cropGrid1mButton);
+            drawCropGrid();
+        }
 
         drawCropGrid();
     }
