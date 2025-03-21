@@ -26,7 +26,8 @@
         @role('admin')
             <div class="space-y-3 ">
                 <label class="px-3 text-xs text-gray-500 uppercase font-semibold">Moderation</label>
-                <x-navbar-links href="manage-users" icon="fa-user-gear">Manage Users</x-navbar-links>
+                <x-navbar-links href="/manage-users" icon="fa-user-gear">Manage Users</x-navbar-links>
+                <x-navbar-links href="/manage-plots" icon="fa-vector-square">Manage Plots</x-navbar-links>
             </div>
         @endrole
     </nav>

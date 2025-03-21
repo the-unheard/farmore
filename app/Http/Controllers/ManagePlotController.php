@@ -2,34 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Plot;
 use App\Models\User;
 
-class ManageUserController extends Controller
+class ManagePlotController extends Controller
 {
 
     public function index()
     {
-        return view('manage-users.index', [
-            'users' => User::select('id', 'username', 'email', 'created_at')->with('roles:id,name')->orderBy('id', 'asc')->paginate(10)
-        ]);
+        $plots = $this->getPlotDetails(Plot::query()) // Use the reusable function
+            ->orderBy('plots.id')
+            ->paginate(10);
+
+        return view('manage-plots.index', compact('plots'));
     }
 
     public function show($id)
     {
-        $user = User::with('roles:id,name')->find($id);
+        $plot = $this->getPlotDetails(Plot::where('plots.id', $id))->first();
 
-        if (!$user) {
-            return redirect()->route('manage-users.index')->with('error', 'User not found.');
+        if (!$plot) {
+            return redirect()->route('manage-plots.index')->with('error', 'Plot not found.');
         }
 
-        return view('manage-users.show', ['user' => $user]);
+        return view('manage-plots.show', ['plot' => $plot]);
     }
-
 
     public function edit($id)
     {
         $user = User::findOrFail($id);
-
 
         return view('manage-users.edit', [
             'user' => $user,
@@ -73,5 +74,16 @@ class ManageUserController extends Controller
 
         return $validatedData;
     }
+
+    private function getPlotDetails($query)
+    {
+        return $query->select('plots.id', 'plots.name', 'plots.city', 'plots.hectare', 'plots.public', 'users.username')
+            ->leftJoin('users', 'plots.user_id', '=', 'users.id') // Get username from users
+            ->leftJoin('ratings', 'plots.id', '=', 'ratings.plot_id') // Join ratings
+            ->selectRaw('ROUND(COALESCE(AVG(ratings.rating), 0), 2) as average_rating, COUNT(ratings.id) as rating_count')
+            ->selectRaw('CASE WHEN plots.public = 1 THEN "Yes" ELSE "No" END as is_public')
+            ->groupBy('plots.id', 'plots.name', 'plots.city', 'plots.hectare', 'plots.public', 'users.username');
+    }
+
 
 }
