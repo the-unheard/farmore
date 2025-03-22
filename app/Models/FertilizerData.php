@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class FertilizerData extends Model
 {
     protected $table = 'fertilizer_data';
-    protected $guard = [];
+    protected $guarded = [];
 }

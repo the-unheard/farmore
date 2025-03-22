@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class CityClimate extends Model
 {
     protected $table = 'city_climates';
-    protected $guard = [];
+    protected $guarded = [];
 }
