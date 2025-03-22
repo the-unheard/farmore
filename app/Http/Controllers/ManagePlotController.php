@@ -30,10 +30,10 @@ class ManagePlotController extends Controller
 
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        $plot = Plot::findOrFail($id);
 
-        return view('manage-users.edit', [
-            'user' => $user,
+        return view('manage-plots.edit', [
+            'plot' => $plot,
         ]);
     }
 
@@ -41,34 +41,29 @@ class ManagePlotController extends Controller
     {
         $validatedData = $this->validateInput();
 
-        $user = User::findOrFail($id);
-        $user->update($validatedData);
+        $plot = Plot::findOrFail($id);
+        $plot->update($validatedData);
 
-        return redirect('/manage-users/' . $id)->with('success', 'User record updated successfully.');
+        return redirect('/manage-plots/' . $id)->with('success', 'Plot record updated successfully.');
     }
 
     public function destroy($id)
     {
 
-        $user = User::findOrFail($id);
+        $plot = Plot::findOrFail($id);
+        $plot->delete();
 
-        if ($user->id === 1) {
-            return redirect('/manage-users')->with('Error', 'You don\'t have permission to delete this.');
-        }
-
-        $user->delete();
-        return redirect('/manage-users')->with('success', 'User deleted successfully.');
+        return redirect('/manage-plots')->with('success', 'Plot deleted successfully.');
     }
 
     private function validateInput(): array
     {
         $validatedData = request()->validate([
-            'username' => [
+            'name' => [
                 'required',
-                'regex:/^[a-zA-Z0-9._-]+$/', // Allows letters, numbers, dots, dashes, and underscores
+                'regex:/^[a-zA-Z0-9._\-\s]+$/', // Allows letters, numbers, dots, dashes, underscores and space
                 'min:1',
-                'max:20',
-                'unique:users,username,' . request()->route('user')
+                'max:30',
             ],
         ]);
 

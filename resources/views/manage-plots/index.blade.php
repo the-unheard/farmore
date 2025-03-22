@@ -2,7 +2,7 @@
     <x-slot:title>Manage Plots</x-slot:title>
 
     <h5 class="font-bold text-4xl text-gray-700 my-8">
-        <i class="fas fa-user-gear"></i>
+        <i class="fas fa-vector-square"></i>
         Manage Plots
     </h5>
     <!-- Table -->

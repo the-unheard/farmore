@@ -48,7 +48,7 @@ Route::resource('crop-recommendation', CropRecommendationController::class)->onl
 
 // manage users
 Route::resource('/manage-users', ManageUserController::class)->only(['index', 'show', 'edit', 'update', 'destroy'])->middleware('role:admin');
-Route::resource('/manage-plots', ManagePlotController::class)->only(['index', 'show'])->middleware('role:admin');
+Route::resource('/manage-plots', ManagePlotController::class)->only(['index', 'show', 'edit', 'update', 'destroy'])->middleware('role:admin');
 
 // soil health - complete
 //Route::get('/soil', [SoilController::class, 'index']);
