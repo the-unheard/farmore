@@ -66,7 +66,7 @@
                 @endforeach
             </div>
         @else
-            <div class="w-2/3 h-[200px] mt-10 bg-gray-50 rounded-lg shadow p-6 flex items-center justify-center">
+            <div class="mt-2 p-4 flex">
                 <h2 class="text-lg font-semibold text-gray-800">No crop recommendations available</h2>
             </div>
         @endif
